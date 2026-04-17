@@ -1,4 +1,4 @@
-name: Build macOS App
+name: Build macOS Intel App
 on: [push, workflow_dispatch]
 
 jobs:

@@ -1,6 +1,7 @@
 import wx
 import wx.adv
 import os
+import sys
 
 # Fix working directory for macOS app bundle
 if getattr(sys, 'frozen', False):

@@ -3,7 +3,7 @@ from cx_Freeze import setup, Executable
 
 # Options for building the macOS bundle
 build_exe_options = {
-    "packages": ["os"],  # List required packages here
+    "packages": ["os","wx"],  # List required packages here
     "excludes": ["tkinter"], # Exclude unnecessary modules
 }
 

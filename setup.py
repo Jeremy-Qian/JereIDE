@@ -10,7 +10,7 @@ build_exe_options = {
 # Specific macOS bundle options
 bdist_mac_options = {
     "bundle_name": "JereIDE", # Name of the .app file
-    "iconfile": "AppIcon.icns", # Path to your .icns icon
+    "iconfile": "BetaAppIcon.icns", # Path to your .icns icon
 }
 
 setup(

@@ -6,7 +6,7 @@ import sys
 # Fix working directory for macOS app bundle
 if getattr(sys, 'frozen', False):
     os.chdir(sys._MEIPASS)
-
+aijsofjsoidfjosadofjo
 
 class MainFrame(wx.Frame):
     def __init__(self, parent, title):

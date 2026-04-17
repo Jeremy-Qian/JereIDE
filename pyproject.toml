@@ -4,7 +4,7 @@ bundle = "com.jeremy"
 version = "0.1"
 license.file="LICENSE"
 
-[tool.briefcase.app.myapp]
+[tool.briefcase.app.main]
 formal_name = "JereIDE"
 description = "My first Briefcase App"
-sources = ['main.py']
+sources = ['src']

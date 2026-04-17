@@ -1,0 +1,9 @@
+[tool.briefcase]
+project_name = "JereIDE"
+bundle = "com.jeremy"
+version = "0.1"
+
+[tool.briefcase.app.myapp]
+formal_name = "JereIDE"
+description = "My first Briefcase App"
+sources = ['main.py']

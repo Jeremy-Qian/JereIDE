@@ -23,7 +23,7 @@ jobs:
         run: |
           # Use --windowed to create a .app bundle instead of just a binary
           # Use --onefile to package everything into a single component
-          pyinstaller --onefile --windowed -i BetaAppIcon.icns --target-arch universal2 src/jereide/__main__.py
+          pyinstaller --onefile --windowed -i BetaAppIcon.icns --target-arch x64 src/jereide/__main__.py
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

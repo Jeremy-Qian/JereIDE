@@ -2,6 +2,11 @@ import wx
 import wx.adv
 import os
 
+# Fix working directory for macOS app bundle
+if getattr(sys, 'frozen', False):
+    os.chdir(sys._MEIPASS)
+
+
 class MainFrame(wx.Frame):
     def __init__(self, parent, title):
         # Use wx.Size for the window dimensions to satisfy type checking.

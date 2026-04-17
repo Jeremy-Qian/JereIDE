@@ -1,0 +1,37 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Matches your local version
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install cx_Freeze wxpython
+          # if [[ -f requirements.txt ]]; then pip install -r requirements.txt; fi
+
+      - name: Build .app bundle
+        run: python setup.py bdist_mac
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: JereIDE-macOS
+          # This path targets the .app bundle inside the build folder
+          path: build/*.app
+          if-no-files-found: error

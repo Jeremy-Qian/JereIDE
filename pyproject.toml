@@ -2,6 +2,7 @@
 project_name = "JereIDE"
 bundle = "com.jeremy"
 version = "0.1"
+license.file="LICENSE"
 
 [tool.briefcase.app.myapp]
 formal_name = "JereIDE"

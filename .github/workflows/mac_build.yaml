@@ -23,7 +23,7 @@ jobs:
         run: |
           # Use --windowed to create a .app bundle instead of just a binary
           # Use --onefile to package everything into a single component
-          pyinstaller --onefile --windowed -i BetaAppIcon.icns --target-arch x86_64 src/jereide/JereIDE.py
+          pyinstaller --onedir --windowed -i BetaAppIcon.icns --target-arch x86_64 src/jereide/JereIDE.py
       - name: Create PlugIns Folder
         run: |
           mkdir -p dist/JereIDE.app/Contents/PlugIns

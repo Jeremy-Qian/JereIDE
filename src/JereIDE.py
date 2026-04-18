@@ -1,8 +1,8 @@
 import wx
-import wx.adv
 import os
 import sys
 import wx.stc
+from components.helpdialog import show_about_dialog
 
 class MainFrame(wx.Frame):
     def __init__(self, parent, title):
@@ -148,15 +148,7 @@ class MainFrame(wx.Frame):
 
     def on_about(self, event):
         """Display an About dialog for JereIDE."""
-        info = wx.adv.AboutDialogInfo()
-        info.SetName("JereIDE")
-        info.SetVersion("1.0")
-        info.SetDescription(
-            "JereIDE – a minimal IDE built with wxPython.\n"
-            "Features include opening, saving, and basic text editing."
-        )
-        info.SetCopyright("Copyright (C) 2026 Jeremy-Qian")
-        wx.adv.AboutBox(info)
+        show_about_dialog(self)
 
     def update_title(self):
         """Update the window title to reflect file name and modification status."""

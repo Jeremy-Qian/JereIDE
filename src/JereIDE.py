@@ -9,7 +9,9 @@ class MainFrame(wx.Frame):
         # Use wx.Size for the window dimensions to satisfy type checking.
         super(MainFrame, self).__init__(parent, title=title, size=wx.Size(800, 600))
         self.current_file = None
+        self.is_modified = False
         self.init_ui()
+        self.update_title()
 
     def init_ui(self):
         self.create_menu()
@@ -77,6 +79,10 @@ class MainFrame(wx.Frame):
         self.Show()
 
     def on_text_change(self, event):
+        # Mark document as modified when text changes
+        self.is_modified = True
+        self.update_title()
+        
         # Adjust the width of the line‑number margin so numbers never get clipped.
         line_count = self.text_ctrl.GetLineCount()
         digit_count = len(str(line_count))
@@ -101,6 +107,9 @@ class MainFrame(wx.Frame):
             self.current_file = dialog.GetPath()
             with open(self.current_file, "r") as file:
                 self.text_ctrl.SetValue(file.read())
+            # Reset modification status and update title
+            self.is_modified = False
+            self.update_title()
             # Update the line‑number margin after loading a file.
             self.on_text_change(None)
         dialog.Destroy()
@@ -109,6 +118,9 @@ class MainFrame(wx.Frame):
         if self.current_file:
             with open(self.current_file, "w") as file:
                 file.write(self.text_ctrl.GetValue())
+            # Reset modification status and update title
+            self.is_modified = False
+            self.update_title()
         else:
             wildcard = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
             dialog = wx.FileDialog(
@@ -123,6 +135,9 @@ class MainFrame(wx.Frame):
                 self.current_file = dialog.GetPath()
                 with open(self.current_file, "w") as file:
                     file.write(self.text_ctrl.GetValue())
+                # Reset modification status and update title
+                self.is_modified = False
+                self.update_title()
             dialog.Destroy()
 
     def on_exit(self, event):
@@ -139,6 +154,22 @@ class MainFrame(wx.Frame):
         )
         info.SetCopyright("(C) 2024 Jeremy")
         wx.adv.AboutBox(info)
+    
+    def update_title(self):
+        """Update the window title to reflect file name and modification status."""
+        if self.current_file:
+            # Extract just the filename from the full path
+            file_name = os.path.basename(self.current_file)
+            title = file_name
+        else:
+            title = "Untitled"
+        
+        # Add a dot to indicate unsaved changes (Mac-style)
+        if self.is_modified:
+            title += " •"
+        
+        # Set the window title
+        self.SetTitle(title)
 
 
 class MainApp(wx.App):

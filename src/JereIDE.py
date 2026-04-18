@@ -46,9 +46,7 @@ class MainFrame(wx.Frame):
         self.SetMenuBar(menu_bar)
 
     def create_text_area(self):
-        """Create a multiline text control with a fixed‑width font."""
-        self.text_ctrl = wx.TextCtrl(self, style=wx.TE_MULTILINE)
-        # Use proper font constants.
+        """Create a multiline text control with line numbers."""
         font = wx.Font(
             10,
             wx.FONTFAMILY_MODERN,
@@ -57,8 +55,32 @@ class MainFrame(wx.Frame):
             False,
             "Menlo"
         )
+
+        self.line_numbers = wx.TextCtrl(
+            self, style=wx.TE_READONLY | wx.TE_RIGHT | wx.TE_NO_VSCROLL,
+            size=wx.Size(40, -1)
+        )
+        self.line_numbers.SetFont(font)
+        self.line_numbers.SetBackgroundColour("#f0f0f0")
+        self.line_numbers.SetValue("1")
+
+        self.text_ctrl = wx.TextCtrl(self, style=wx.TE_MULTILINE)
         self.text_ctrl.SetFont(font)
+
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.line_numbers, 0, wx.EXPAND)
+        sizer.Add(self.text_ctrl, 1, wx.EXPAND | wx.ALIGN_LEFT)
+
+        self.SetSizer(sizer)
+
+        self.text_ctrl.Bind(wx.EVT_TEXT, self.on_text_change)
         self.Show()
+
+    def on_text_change(self, event):
+        text = self.text_ctrl.GetValue()
+        line_count = text.count("\n") + (1 if text else 0)
+        line_numbers = "\n".join(str(i) for i in range(1, line_count + 1))
+        self.line_numbers.SetValue(line_numbers)
 
     # -----------------------------------------------------------------
     # Menu command handlers
@@ -72,6 +94,10 @@ class MainFrame(wx.Frame):
             self.current_file = dialog.GetPath()
             with open(self.current_file, "r") as file:
                 self.text_ctrl.SetValue(file.read())
+            text = self.text_ctrl.GetValue()
+            line_count = text.count("\n") + (1 if text else 0)
+            line_numbers = "\n".join(str(i) for i in range(1, line_count + 1))
+            self.line_numbers.SetValue(line_numbers)
         dialog.Destroy()
 
     def on_save(self, event):

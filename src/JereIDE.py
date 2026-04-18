@@ -85,13 +85,7 @@ class MainFrame(wx.Frame):
         ) + 4
         self.text_ctrl.SetMarginWidth(1, margin_width)
 
-        # Dynamically show or hide the vertical scrollbar based on visible lines.
-        last_visible = self.text_ctrl.GetLastVisibleLine()
-        if line_count <= (last_visible + 1):
-            self.text_ctrl.SetUseVerticalScrollBar(False)
-        else:
-            self.text_ctrl.SetUseVerticalScrollBar(True)
-
+        # Let the control manage its own vertical scrolling.
         if event:
             event.Skip()
 

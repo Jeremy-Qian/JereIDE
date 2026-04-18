@@ -71,6 +71,8 @@ class MainFrame(wx.Frame):
         sizer.Add(self.text_ctrl, 1, wx.EXPAND)
         self.SetSizer(sizer)
 
+        self.text_ctrl.SetUseHorizontalScrollBar(False)
+        self.text_ctrl.SetWrapMode(wx.stc.STC_WRAP_WORD)
         self.text_ctrl.Bind(wx.stc.EVT_STC_CHANGE, self.on_text_change)
         self.Show()
 
@@ -82,6 +84,8 @@ class MainFrame(wx.Frame):
             wx.stc.STC_STYLE_LINENUMBER, "9" * digit_count
         ) + 4
         self.text_ctrl.SetMarginWidth(1, margin_width)
+
+        # Let the control manage its own vertical scrolling.
         if event:
             event.Skip()
 

@@ -157,17 +157,32 @@ class MainFrame(wx.Frame):
     
     def update_title(self):
         """Update the window title to reflect file name and modification status."""
+        is_macos = sys.platform == "darwin"
+
         if self.current_file:
             # Extract just the filename from the full path
             file_name = os.path.basename(self.current_file)
             title = file_name
+            if is_macos:
+                # Set the proxy icon and path for macOS
+                self.SetRepresentedFilename(self.current_file)
         else:
             title = "Untitled"
-        
-        # Add a dot to indicate unsaved changes (Mac-style)
+            if is_macos:
+                # Clear the proxy icon for unsaved files
+                self.SetRepresentedFilename("")
+
+        # Handle modification status
         if self.is_modified:
-            title += " •"
-        
+            if is_macos:
+                # Use the native macOS "dirty" state indicator (dot in the close button)
+                self.OSXSetModified(True)
+            else:
+                # Add a dot to indicate unsaved changes for other platforms
+                title += " •"
+        elif is_macos:
+            self.OSXSetModified(False)
+
         # Set the window title
         self.SetTitle(title)
 

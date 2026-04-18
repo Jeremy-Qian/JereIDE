@@ -82,7 +82,7 @@ class MainFrame(wx.Frame):
         # Mark document as modified when text changes
         self.is_modified = True
         self.update_title()
-        
+
         # Adjust the width of the line‑number margin so numbers never get clipped.
         line_count = self.text_ctrl.GetLineCount()
         digit_count = len(str(line_count))
@@ -154,7 +154,7 @@ class MainFrame(wx.Frame):
         )
         info.SetCopyright("(C) 2024 Jeremy")
         wx.adv.AboutBox(info)
-    
+
     def update_title(self):
         """Update the window title to reflect file name and modification status."""
         is_macos = sys.platform == "darwin"
@@ -177,6 +177,8 @@ class MainFrame(wx.Frame):
             if is_macos:
                 # Use the native macOS "dirty" state indicator (dot in the close button)
                 self.OSXSetModified(True)
+                # Add "- Edited" suffix for macOS
+                title += " — Edited"
             else:
                 # Add a dot to indicate unsaved changes for other platforms
                 title += " •"

@@ -26,15 +26,12 @@ class MainFrame(wx.Frame):
         # ---- File menu -------------------------------------------------
         file_menu = wx.Menu()
         open_item = file_menu.Append(
-            wx.ID_OPEN, "&Open\tCtrl+O", "Open a file")
+            wx.ID_OPEN, "&Open...\tCtrl+O", "Open a file")
         save_item = file_menu.Append(
             wx.ID_SAVE, "&Save\tCtrl+S", "Save the file")
-        exit_item = file_menu.Append(
-            wx.ID_EXIT, "E&xit\tCtrl+Q", "Exit the application")
 
         self.Bind(wx.EVT_MENU, self.on_open, open_item)
         self.Bind(wx.EVT_MENU, self.on_save, save_item)
-        self.Bind(wx.EVT_MENU, self.on_exit, exit_item)
 
         menu_bar.Append(file_menu, "&File")
 
@@ -142,9 +139,6 @@ class MainFrame(wx.Frame):
                 self.is_modified = False
                 self.update_title()
             dialog.Destroy()
-
-    def on_exit(self, event):
-        self.Close()
 
     def on_about(self, event):
         """Display an About dialog for JereIDE."""

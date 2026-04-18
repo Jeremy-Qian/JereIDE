@@ -155,7 +155,7 @@ class MainFrame(wx.Frame):
             "JereIDE – a minimal IDE built with wxPython.\n"
             "Features include opening, saving, and basic text editing."
         )
-        info.SetCopyright("(C) 2024 Jeremy")
+        info.SetCopyright("Copyright (C) 2026 Jeremy-Qian")
         wx.adv.AboutBox(info)
 
     def update_title(self):

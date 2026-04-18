@@ -64,7 +64,7 @@ class MainFrame(wx.Frame):
         self.line_numbers.SetBackgroundColour("#f0f0f0")
         self.line_numbers.SetValue("1")
 
-        self.text_ctrl = wx.TextCtrl(self, style=wx.TE_MULTILINE)
+        self.text_ctrl = wx.TextCtrl(self, style=wx.TE_MULTILINE | wx.TE_DONTWRAP)
         self.text_ctrl.SetFont(font)
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)

@@ -9,7 +9,7 @@ class MainFrame(wx.Frame):
         # Use wx.Size for the window dimensions to satisfy type checking.
         super(MainFrame, self).__init__(parent, title=title, size=wx.Size(800, 600))
         self.current_file = None
-        self.is_modified = False
+        self.is_modified = True
         self.init_ui()
         self.update_title()
 
@@ -76,20 +76,23 @@ class MainFrame(wx.Frame):
         self.text_ctrl.SetUseHorizontalScrollBar(False)
         self.text_ctrl.SetWrapMode(wx.stc.STC_WRAP_WORD)
         self.text_ctrl.Bind(wx.stc.EVT_STC_CHANGE, self.on_text_change)
+        self.update_line_number_margin()
         self.Show()
 
-    def on_text_change(self, event):
-        # Mark document as modified when text changes
-        self.is_modified = True
-        self.update_title()
-
-        # Adjust the width of the line‑number margin so numbers never get clipped.
+    def update_line_number_margin(self):
+        """Adjust the width of the line‑number margin so numbers never get clipped."""
         line_count = self.text_ctrl.GetLineCount()
         digit_count = len(str(line_count))
         margin_width = self.text_ctrl.TextWidth(
             wx.stc.STC_STYLE_LINENUMBER, "9" * digit_count
         ) + 4
         self.text_ctrl.SetMarginWidth(1, margin_width)
+
+    def on_text_change(self, event):
+        # Mark document as modified when text changes
+        self.is_modified = True
+        self.update_title()
+        self.update_line_number_margin()
 
         # Let the control manage its own vertical scrolling.
         if event:
@@ -111,7 +114,7 @@ class MainFrame(wx.Frame):
             self.is_modified = False
             self.update_title()
             # Update the line‑number margin after loading a file.
-            self.on_text_change(None)
+            self.update_line_number_margin()
         dialog.Destroy()
 
     def on_save(self, event):

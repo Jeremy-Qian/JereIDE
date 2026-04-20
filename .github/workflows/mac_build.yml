@@ -1,5 +1,23 @@
 name: Build macOS Intel App
-on: [push, workflow_dispatch]
+on:
+  push:
+    paths:
+      - "src/**"               # All source files
+      - "icons/**"             # Icon assets
+      - "requirements.txt"     # Python‑pip deps (or your equivalent)
+      - "pyproject.toml"       # Poetry/PEP‑517 build config
+      - "setup.cfg"           # If you use setuptools
+      - "package.json"        # Node / npm deps (if applicable)
+      - "yarn.lock"
+  pull_request:
+    paths:
+      - "src/**"
+      - "icons/**"
+      - "requirements.txt"
+      - "pyproject.toml"
+      - "setup.cfg"
+      - "package.json"
+      - "yarn.lock"
 
 jobs:
   build:
@@ -23,7 +41,7 @@ jobs:
         run: |
           # Use --windowed to create a .app bundle instead of just a binary
           # Use --onefile to package everything into a single component
-          pyinstaller --onedir --windowed -i BetaAppIcon.icns --target-arch x86_64 src/JereIDE.py
+          pyinstaller --onedir --windowed -i icons/BetaAppIcon.icns --target-arch x86_64 src/JereIDE.py
       - name: Remove Quarantine Flag
         run: |
           xattr -cr dist/*.app

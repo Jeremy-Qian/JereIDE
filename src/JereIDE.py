@@ -35,7 +35,7 @@ class MainFrame(wx.Frame):
         # Use wx.Size for the window dimensions to satisfy type checking.
         super(MainFrame, self).__init__(parent, title=title, size=wx.Size(*DEFAULT_WINDOW_SIZE))
         self.current_file = None
-        self.is_modified = True
+        self.is_modified = False
         self.init_ui()
         self.update_title()
 

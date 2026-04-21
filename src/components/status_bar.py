@@ -17,7 +17,7 @@ class StatusPanel(wx.Panel):
         self.status_text.SetPressColor(wx.Colour(200, 200, 200))
         # Layout the text with some padding
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.status_text, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
+        sizer.Add(self.status_text, 0, wx.LEFT, 10)
         self.SetSizer(sizer)
 
     def update_status(self, line, column):
@@ -30,6 +30,8 @@ class StatusPanel(wx.Panel):
         """
         status_text = f"{line}:{column}"
         self.status_text.SetLabel(status_text)
+        # Force the button to resize to fit the new text
+        self.Layout()
 
     def update_from_editor(self, editor):
         """

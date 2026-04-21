@@ -1,0 +1,46 @@
+import wx
+from constants import (
+    MENU_FILE_LABEL,
+    MENU_OPEN_LABEL,
+    MENU_OPEN_HELP,
+    MENU_SAVE_LABEL,
+    MENU_SAVE_HELP,
+    MENU_HELP_LABEL,
+    MENU_ABOUT_LABEL,
+    MENU_ABOUT_HELP
+)
+
+def create_menu_bar(frame):
+    """
+    Constructs the menu bar for the JereIDE main frame and binds menu events.
+    
+    Args:
+        frame: The MainFrame instance to which the menu bar will be attached
+               and whose event handlers will be bound.
+    """
+    menu_bar = wx.MenuBar()
+
+    # ---- File menu -------------------------------------------------
+    file_menu = wx.Menu()
+    open_item = file_menu.Append(
+        wx.ID_OPEN, MENU_OPEN_LABEL, MENU_OPEN_HELP)
+    save_item = file_menu.Append(
+        wx.ID_SAVE, MENU_SAVE_LABEL, MENU_SAVE_HELP)
+
+    # Bind menu events to the frame's methods
+    frame.Bind(wx.EVT_MENU, frame.on_open, open_item)
+    frame.Bind(wx.EVT_MENU, frame.on_save, save_item)
+
+    menu_bar.Append(file_menu, MENU_FILE_LABEL)
+
+    # ---- Help menu ------------------------------------------------
+    help_menu = wx.Menu()
+    about_item = help_menu.Append(
+        wx.ID_ABOUT, MENU_ABOUT_LABEL, MENU_ABOUT_HELP)
+    
+    # Bind menu event to the frame's method
+    frame.Bind(wx.EVT_MENU, frame.on_about, about_item)
+
+    menu_bar.Append(help_menu, MENU_HELP_LABEL)
+
+    frame.SetMenuBar(menu_bar)

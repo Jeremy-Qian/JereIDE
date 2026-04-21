@@ -2,13 +2,7 @@ import wx
 import sys
 import os
 import wx.stc
-from constants import (
-    APP_NAME,
-    DEFAULT_WINDOW_SIZE,
-    UNTITLED_NAME,
-    MACOS_EDITED_SUFFIX,
-    OTHER_EDITED_SUFFIX
-)
+from constants import *
 from components.editor import Editor
 from components.menu_builder import create_menu_bar
 from utils.file_io import open_file, save_file

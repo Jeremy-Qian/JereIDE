@@ -4,7 +4,7 @@ import os
 import wx.stc
 from constants import *
 from components.editor import Editor
-from components.status_bar import StatusBar
+from components.status_bar import StatusPanel
 from components.menu_builder import create_menu_bar
 from utils.file_io import open_file, save_file
 
@@ -27,13 +27,13 @@ class MainFrame(wx.Frame):
         self.editor.Bind(wx.stc.EVT_STC_CHANGE, self.on_text_change)
         self.editor.Bind(wx.stc.EVT_STC_UPDATEUI, self.on_update_ui)
 
-        # Setup Status Bar
-        self.status_bar = StatusBar(self)
-        self.SetStatusBar(self.status_bar)
+        # Setup Status Panel (replacing traditional status bar)
+        self.status_panel = StatusPanel(self)
 
         # Layout
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.editor, 1, wx.EXPAND)
+        sizer.Add(self.status_panel, 0, wx.EXPAND)
         self.SetSizer(sizer)
 
         self.Centre()
@@ -48,8 +48,8 @@ class MainFrame(wx.Frame):
             event.Skip()
 
     def on_update_ui(self, event):
-        """Handle UI update events to refresh the status bar."""
-        self.status_bar.update_from_editor(self.editor)
+        """Handle UI update events to refresh the status panel."""
+        self.status_panel.update_from_editor(self.editor)
         if event:
             event.Skip()
 
@@ -68,8 +68,8 @@ class MainFrame(wx.Frame):
             self.update_title()
             # Update the line‑number margin after loading a file.
             self.editor.update_line_number_margin()
-            # Update the status bar.
-            self.status_bar.update_from_editor(self.editor)
+            # Update the status panel.
+            self.status_panel.update_from_editor(self.editor)
 
     def on_save(self, event):
         """Handle the Save menu command."""

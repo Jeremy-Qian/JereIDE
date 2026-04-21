@@ -129,22 +129,105 @@ class MainFrame(wx.Frame):
         )
         if dialog.ShowModal() == wx.ID_OK:
             self.current_file = dialog.GetPath()
-            with open(self.current_file, "r") as file:
-                self.text_ctrl.SetValue(file.read())
-            # Reset modification status and update title
-            self.is_modified = False
-            self.update_title()
-            # Update the line‑number margin after loading a file.
-            self.update_line_number_margin()
+            
+            # Validate that file is readable before attempting to open
+            if not os.access(self.current_file, os.R_OK):
+                wx.MessageBox(
+                    f"Cannot open file: {self.current_file}\n"
+                    "The file may not exist or you may not have read permissions.",
+                    "File Error",
+                    wx.OK | wx.ICON_ERROR,
+                    self
+                )
+                dialog.Destroy()
+                return
+            
+            try:
+                with open(self.current_file, "r", encoding='utf-8') as file:
+                    self.text_ctrl.SetValue(file.read())
+                # Reset modification status and update title
+                self.is_modified = False
+                self.update_title()
+                # Update the line‑number margin after loading a file.
+                self.update_line_number_margin()
+            except IOError as e:
+                wx.MessageBox(
+                    f"Error reading file: {self.current_file}\n"
+                    f"IOError: {str(e)}",
+                    "File Error",
+                    wx.OK | wx.ICON_ERROR,
+                    self
+                )
+            except UnicodeDecodeError as e:
+                wx.MessageBox(
+                    f"Error reading file: {self.current_file}\n"
+                    f"The file contains characters that cannot be decoded as UTF-8.\n"
+                    f"UnicodeDecodeError: {str(e)}",
+                    "Encoding Error",
+                    wx.OK | wx.ICON_ERROR,
+                    self
+                )
+            except Exception as e:
+                wx.MessageBox(
+                    f"Unexpected error reading file: {self.current_file}\n"
+                    f"Error: {str(e)}",
+                    "File Error",
+                    wx.OK | wx.ICON_ERROR,
+                    self
+                )
         dialog.Destroy()
 
     def on_save(self, event):
         if self.current_file:
-            with open(self.current_file, "w") as file:
-                file.write(self.text_ctrl.GetValue())
-            # Reset modification status and update title
-            self.is_modified = False
-            self.update_title()
+            # Validate that the directory is writable before attempting to save
+            save_dir = os.path.dirname(self.current_file)
+            if not os.access(save_dir, os.W_OK):
+                wx.MessageBox(
+                    f"Cannot save to: {save_dir}\n"
+                    "You may not have write permissions for this directory.",
+                    "File Error",
+                    wx.OK | wx.ICON_ERROR,
+                    self
+                )
+                return
+            
+            try:
+                # Test if we can write to the file location
+                test_file = os.path.join(save_dir, '.write_test')
+                with open(test_file, 'w') as f:
+                    f.write('test')
+                os.remove(test_file)
+                
+                with open(self.current_file, "w", encoding='utf-8') as file:
+                    file.write(self.text_ctrl.GetValue())
+                # Reset modification status and update title
+                self.is_modified = False
+                self.update_title()
+            except IOError as e:
+                wx.MessageBox(
+                    f"Error saving file: {self.current_file}\n"
+                    f"IOError: {str(e)}",
+                    "File Error",
+                    wx.OK | wx.ICON_ERROR,
+                    self
+                )
+            except UnicodeEncodeError as e:
+                wx.MessageBox(
+                    f"Error saving file: {self.current_file}\n"
+                    f"The text contains characters that cannot be encoded as UTF-8.\n"
+                    f"UnicodeEncodeError: {str(e)}",
+                    "Encoding Error",
+                    wx.OK | wx.ICON_ERROR,
+                    self
+                )
+            except Exception as e:
+                wx.MessageBox(
+                    f"Unexpected error saving file: {self.current_file}\n"
+                    f"Error: {str(e)}",
+                    "File Error",
+                    wx.OK | wx.ICON_ERROR,
+                    self
+                )
         else:
             dialog = wx.FileDialog(
                 self,
@@ -156,11 +239,57 @@ class MainFrame(wx.Frame):
             )
             if dialog.ShowModal() == wx.ID_OK:
                 self.current_file = dialog.GetPath()
-                with open(self.current_file, "w") as file:
-                    file.write(self.text_ctrl.GetValue())
-                # Reset modification status and update title
-                self.is_modified = False
-                self.update_title()
+                
+                # Validate that the directory is writable before attempting to save
+                save_dir = os.path.dirname(self.current_file)
+                if not os.access(save_dir, os.W_OK):
+                    wx.MessageBox(
+                        f"Cannot save to: {save_dir}\n"
+                        "You may not have write permissions for this directory.",
+                        "File Error",
+                        wx.OK | wx.ICON_ERROR,
+                        self
+                    )
+                    dialog.Destroy()
+                    return
+                
+                try:
+                    # Test if we can write to the file location
+                    test_file = os.path.join(save_dir, '.write_test')
+                    with open(test_file, 'w') as f:
+                        f.write('test')
+                    os.remove(test_file)
+                    
+                    with open(self.current_file, "w", encoding='utf-8') as file:
+                        file.write(self.text_ctrl.GetValue())
+                    # Reset modification status and update title
+                    self.is_modified = False
+                    self.update_title()
+                except IOError as e:
+                    wx.MessageBox(
+                        f"Error saving file: {self.current_file}\n"
+                        f"IOError: {str(e)}",
+                        "File Error",
+                        wx.OK | wx.ICON_ERROR,
+                        self
+                    )
+                except UnicodeEncodeError as e:
+                    wx.MessageBox(
+                        f"Error saving file: {self.current_file}\n"
+                        f"The text contains characters that cannot be encoded as UTF-8.\n"
+                        f"UnicodeEncodeError: {str(e)}",
+                        "Encoding Error",
+                        wx.OK | wx.ICON_ERROR,
+                        self
+                    )
+                except Exception as e:
+                    wx.MessageBox(
+                        f"Unexpected error saving file: {self.current_file}\n"
+                        f"Error: {str(e)}",
+                        "File Error",
+                        wx.OK | wx.ICON_ERROR,
+                        self
+                    )
             dialog.Destroy()
 
     def on_about(self, event):

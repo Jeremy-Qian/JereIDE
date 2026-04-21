@@ -14,9 +14,9 @@ def create_menu_bar(frame):
     # ---- File menu -------------------------------------------------
     file_menu = wx.Menu()
     open_item = file_menu.Append(
-        wx.ID_OPEN, MENU_OPEN_LABEL, MENU_OPEN_HELP)
+        wx.ID_OPEN, MENU_OPEN_LABEL)
     save_item = file_menu.Append(
-        wx.ID_SAVE, MENU_SAVE_LABEL, MENU_SAVE_HELP)
+        wx.ID_SAVE, MENU_SAVE_LABEL)
 
     # Bind menu events to the frame's methods
     frame.Bind(wx.EVT_MENU, frame.on_open, open_item)
@@ -27,7 +27,7 @@ def create_menu_bar(frame):
     # ---- View menu -------------------------------------------------
     view_menu = wx.Menu()
     toggle_line_numbers_item = view_menu.Append(
-        wx.ID_ANY, MENU_TOGGLE_LINE_NUMBERS_LABEL, MENU_TOGGLE_LINE_NUMBERS_HELP)
+        wx.ID_ANY, MENU_TOGGLE_LINE_NUMBERS_LABEL)
 
     # Bind menu events to the frame's methods
     frame.Bind(wx.EVT_MENU, frame.on_toggle_line_numbers, toggle_line_numbers_item)
@@ -37,7 +37,7 @@ def create_menu_bar(frame):
     # ---- Help menu ------------------------------------------------
     help_menu = wx.Menu()
     about_item = help_menu.Append(
-        wx.ID_ABOUT, MENU_ABOUT_LABEL, MENU_ABOUT_HELP)
+        wx.ID_ABOUT, MENU_ABOUT_LABEL)
 
     # Bind menu event to the frame's method
     frame.Bind(wx.EVT_MENU, frame.on_about, about_item)

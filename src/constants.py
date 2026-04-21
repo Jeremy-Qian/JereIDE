@@ -19,6 +19,10 @@ MENU_OPEN_HELP = "Open a file"
 MENU_SAVE_LABEL = "&Save\tCtrl+S"
 MENU_SAVE_HELP = "Save the file"
 
+MENU_VIEW_LABEL = "&View"
+MENU_TOGGLE_LINE_NUMBERS_LABEL = "Toggle &Line Numbers"
+MENU_TOGGLE_LINE_NUMBERS_HELP = "Show or hide the line numbers margin"
+
 MENU_HELP_LABEL = "&Help"
 MENU_ABOUT_LABEL = f"&About {APP_NAME}"
 MENU_ABOUT_HELP = f"Show information about {APP_NAME}"

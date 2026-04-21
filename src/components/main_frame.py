@@ -4,6 +4,7 @@ import os
 import wx.stc
 from constants import *
 from components.editor import Editor
+from components.status_bar import StatusBar
 from components.menu_builder import create_menu_bar
 from utils.file_io import open_file, save_file
 
@@ -24,6 +25,11 @@ class MainFrame(wx.Frame):
         # Setup Editor Component
         self.editor = Editor(self)
         self.editor.Bind(wx.stc.EVT_STC_CHANGE, self.on_text_change)
+        self.editor.Bind(wx.stc.EVT_STC_UPDATEUI, self.on_update_ui)
+
+        # Setup Status Bar
+        self.status_bar = StatusBar(self)
+        self.SetStatusBar(self.status_bar)
 
         # Layout
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -41,6 +47,16 @@ class MainFrame(wx.Frame):
         if event:
             event.Skip()
 
+    def on_update_ui(self, event):
+        """Handle UI update events to refresh the status bar."""
+        self.status_bar.update_from_editor(self.editor)
+        if event:
+            event.Skip()
+
+    def on_toggle_line_numbers(self, event):
+        """Handle the Toggle Line Numbers menu command."""
+        self.editor.toggle_line_numbers()
+
     def on_open(self, event):
         """Handle the Open menu command."""
         path, content = open_file(self)
@@ -52,6 +68,8 @@ class MainFrame(wx.Frame):
             self.update_title()
             # Update the line‑number margin after loading a file.
             self.editor.update_line_number_margin()
+            # Update the status bar.
+            self.status_bar.update_from_editor(self.editor)
 
     def on_save(self, event):
         """Handle the Save menu command."""

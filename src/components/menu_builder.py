@@ -5,6 +5,9 @@ from constants import (
     MENU_OPEN_HELP,
     MENU_SAVE_LABEL,
     MENU_SAVE_HELP,
+    MENU_VIEW_LABEL,
+    MENU_TOGGLE_LINE_NUMBERS_LABEL,
+    MENU_TOGGLE_LINE_NUMBERS_HELP,
     MENU_HELP_LABEL,
     MENU_ABOUT_LABEL,
     MENU_ABOUT_HELP
@@ -32,6 +35,16 @@ def create_menu_bar(frame):
     frame.Bind(wx.EVT_MENU, frame.on_save, save_item)
 
     menu_bar.Append(file_menu, MENU_FILE_LABEL)
+
+    # ---- View menu -------------------------------------------------
+    view_menu = wx.Menu()
+    toggle_line_numbers_item = view_menu.Append(
+        wx.ID_ANY, MENU_TOGGLE_LINE_NUMBERS_LABEL, MENU_TOGGLE_LINE_NUMBERS_HELP)
+
+    # Bind menu events to the frame's methods
+    frame.Bind(wx.EVT_MENU, frame.on_toggle_line_numbers, toggle_line_numbers_item)
+
+    menu_bar.Append(view_menu, MENU_VIEW_LABEL)
 
     # ---- Help menu ------------------------------------------------
     help_menu = wx.Menu()

@@ -1,10 +1,6 @@
 import wx
 import os
-from constants import (
-    FILE_WILDCARDS,
-    OPEN_DIALOG_TITLE,
-    SAVE_DIALOG_TITLE
-)
+from constants import *
 
 def open_file(parent):
     """
@@ -14,12 +10,12 @@ def open_file(parent):
     dialog = wx.FileDialog(
         parent, OPEN_DIALOG_TITLE, os.getcwd(), "", FILE_WILDCARDS, wx.FD_OPEN
     )
-    
+
     result = (None, None)
-    
+
     if dialog.ShowModal() == wx.ID_OK:
         path = dialog.GetPath()
-        
+
         # Validate that file is readable
         if not os.access(path, os.R_OK):
             wx.MessageBox(
@@ -59,7 +55,7 @@ def open_file(parent):
                     wx.OK | wx.ICON_ERROR,
                     parent
                 )
-    
+
     dialog.Destroy()
     return result
 
@@ -95,7 +91,7 @@ def save_file(parent, path, content):
             parent
         )
         return None
-    
+
     try:
         with open(path, "w", encoding='utf-8') as file:
             file.write(content)

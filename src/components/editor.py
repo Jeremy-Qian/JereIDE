@@ -1,12 +1,6 @@
 import wx
 import wx.stc
-from constants import (
-    EDITOR_FONT_FACE,
-    EDITOR_FONT_SIZE,
-    LINE_NUMBER_MARGIN_ID,
-    INITIAL_MARGIN_WIDTH,
-    MARGIN_PADDING
-)
+from constants import *
 
 class Editor(wx.stc.StyledTextCtrl):
     def __init__(self, parent):
@@ -34,7 +28,7 @@ class Editor(wx.stc.StyledTextCtrl):
 
         self.SetUseHorizontalScrollBar(False)
         self.SetWrapMode(wx.stc.STC_WRAP_WORD)
-        
+
         self.update_line_number_margin()
 
     def update_line_number_margin(self):

@@ -1,15 +1,16 @@
 import wx
-from constants import APP_NAME
-from components.main_frame import MainFrame
 
-class MainApp(wx.App):
-    def OnInit(self):
+from components.main_frame import MainFrame
+from constants import APP_NAME
+
+
+class JereIDEApp(wx.App):
+    def OnInit(self) -> bool:
         """Initialize the application and show the main frame."""
-        self.frame = MainFrame(None, APP_NAME)
+        self.main_frame = MainFrame(parent=None, title=APP_NAME)
         return True
 
+
 if __name__ == "__main__":
-    # Create the application object
-    app = MainApp()
-    # Start the event loop
+    app = JereIDEApp()
     app.MainLoop()

@@ -1,35 +1,39 @@
 import wx
 
+from constants import (
+    PROJECT_PANEL_BG_COLOR,
+    PROJECT_PANEL_MIN_WIDTH_PX,
+    PROJECT_PANEL_PLACEHOLDER_FONT_SIZE,
+    PROJECT_PANEL_PLACEHOLDER_TEXT,
+)
+
 
 class ProjectPanel(wx.Panel):
     def __init__(self, parent):
         """Initialize the project panel as a collapsible side panel."""
-        super(ProjectPanel, self).__init__(parent)
+        super().__init__(parent)
 
-        # Set a light background color
-        self.SetBackgroundColour((240, 240, 240))
+        self.SetBackgroundColour(PROJECT_PANEL_BG_COLOR)
+        self.SetMinSize((PROJECT_PANEL_MIN_WIDTH_PX, -1))
 
-        # Set a default width for the side panel
-        self.SetMinSize((200, -1))
+        self.placeholder_label = wx.StaticText(
+            self, label=PROJECT_PANEL_PLACEHOLDER_TEXT, style=wx.ALIGN_CENTER
+        )
+        placeholder_font = self.placeholder_label.GetFont()
+        placeholder_font.PointSize = PROJECT_PANEL_PLACEHOLDER_FONT_SIZE
+        self.placeholder_label.SetFont(placeholder_font)
 
-        # Create the text label centered
-        self.label = wx.StaticText(self, label="Needs Implementation", style=wx.ALIGN_CENTER)
-        font = self.label.GetFont()
-        font.PointSize = 12
-        self.label.SetFont(font)
+        layout_sizer = wx.BoxSizer(wx.VERTICAL)
+        layout_sizer.AddStretchSpacer()
+        layout_sizer.Add(self.placeholder_label, 0, wx.ALIGN_CENTER)
+        layout_sizer.AddStretchSpacer()
+        self.SetSizer(layout_sizer)
 
-        # Layout with centered text
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.AddStretchSpacer()
-        sizer.Add(self.label, 0, wx.ALIGN_CENTER)
-        sizer.AddStretchSpacer()
-        self.SetSizer(sizer)
-
-        # Initially hidden
+        # Start collapsed; the status bar's toggle button reveals it.
         self.Hide()
 
-    def toggle_project_panel(self):
-        """Toggle the visibility of the project panel."""
+    def toggle_visibility(self) -> None:
+        """Toggle whether the panel is shown and re-layout the parent frame."""
         if self.IsShown():
             self.Hide()
         else:

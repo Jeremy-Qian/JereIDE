@@ -34,7 +34,7 @@ jobs:
         run: |
           # Use --windowed to create a .app bundle instead of just a binary
           # Use --onefile to package everything into a single component
-          pyinstaller --onedir --windowed -i src/components/icons/BetaAppIcon.icns --target-arch x86_64 src/JereIDE.py
+          pyinstaller --onedir --windowed -i src/components/icons/BetaAppIcon.icns --target-arch x86_64 --add-data "src/components/icons:src/components/icons" src/JereIDE.py
       - name: Remove Quarantine Flag
         run: |
           xattr -cr dist/*.app

@@ -34,8 +34,8 @@ class StatusPanel(wx.Panel):
 
         # Layout the elements with padding
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.toggle_project_btn, 0, wx.LEFT | wx.RIGHT, 5)
-        sizer.Add(self.status_text, 0, wx.LEFT, 10)
+        sizer.Add(self.toggle_project_btn, 0, wx.LEFT | wx.RIGHT, 2)
+        sizer.Add(self.status_text, 0, wx.LEFT, 0)
         self.SetSizer(sizer)
 
     def update_status(self, line, column):

@@ -6,6 +6,8 @@ from constants import *
 from components.editor import Editor
 from components.status_bar import StatusPanel
 from components.menu_builder import create_menu_bar
+from components.project_panel import ProjectPanel
+
 from utils.file_io import open_file, save_file
 
 class MainFrame(wx.Frame):
@@ -26,15 +28,26 @@ class MainFrame(wx.Frame):
         self.editor = Editor(self)
         self.editor.Bind(wx.stc.EVT_STC_CHANGE, self.on_text_change)
         self.editor.Bind(wx.stc.EVT_STC_UPDATEUI, self.on_update_ui)
+        # Project Panel
+        self.project_panel = ProjectPanel(self)
 
         # Setup Status Panel (replacing traditional status bar)
         self.status_panel = StatusPanel(self)
+        self.status_panel.set_project_panel(self.project_panel)
+        self.status_panel.toggle_project_btn.Bind(wx.EVT_BUTTON, self.status_panel.on_toggle_project_panel)
 
         # Layout
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.editor, 1, wx.EXPAND)
-        sizer.Add(self.status_panel, 0, wx.EXPAND)
-        self.SetSizer(sizer)
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Content area with project panel and editor
+        content_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        content_sizer.Add(self.project_panel, 0, wx.EXPAND | wx.RIGHT, 5)
+        content_sizer.Add(self.editor, 1, wx.EXPAND)
+        main_sizer.Add(content_sizer, 1, wx.EXPAND)
+
+        # Status bar at the bottom, spanning full width
+        main_sizer.Add(self.status_panel, 0, wx.EXPAND)
+        self.SetSizer(main_sizer)
 
         self.Centre()
         self.Show()
@@ -62,7 +75,7 @@ class MainFrame(wx.Frame):
         path, content = open_file(self)
         if path is not None:
             self.current_file = path
-            self.editor.SetValue(content)
+            self.editor.SetValue(content or "")
             # Reset modification status and update title
             self.is_modified = False
             self.update_title()

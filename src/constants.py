@@ -133,7 +133,6 @@ INITIAL_STATUS_LABEL = "1:0"
 # Icons
 # ---------------------------------------------------------------------------
 ICONS_DIR_NAME = "src/components/icons"
-PROJECT_TOGGLE_ICON_OFF_FILENAME = "archivebox.png"
-PROJECT_TOGGLE_ICON_ON_FILENAME = "archivebox.fill.png"
-PROJECT_TOGGLE_ICON_WIDTH_PX = 18
+PROJECT_TOGGLE_ICON_FILENAME = "sidebar.left.png"
+PROJECT_TOGGLE_ICON_WIDTH_PX = 20
 PROJECT_TOGGLE_ICON_HEIGHT_PX = 16

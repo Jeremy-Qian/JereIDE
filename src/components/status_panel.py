@@ -4,8 +4,7 @@ import wx.lib.platebtn as platebtn
 from constants import (
     INITIAL_STATUS_LABEL,
     PROJECT_TOGGLE_ICON_HEIGHT_PX,
-    PROJECT_TOGGLE_ICON_OFF_FILENAME,
-    PROJECT_TOGGLE_ICON_ON_FILENAME,
+    PROJECT_TOGGLE_ICON_FILENAME,
     PROJECT_TOGGLE_ICON_WIDTH_PX,
     STATUS_BUTTON_PRESS_COLOR,
     STATUS_PANEL_BG_COLOR,
@@ -32,12 +31,11 @@ class StatusPanel(wx.Panel):
         self.SetMinSize((-1, STATUS_PANEL_HEIGHT_PX))
         self.SetMaxSize((-1, STATUS_PANEL_HEIGHT_PX))
 
-        # Pre-load both states of the project-toggle icon so clicks are cheap.
-        self.project_toggle_icon_off = _load_toggle_icon(PROJECT_TOGGLE_ICON_OFF_FILENAME)
-        self.project_toggle_icon_on = _load_toggle_icon(PROJECT_TOGGLE_ICON_ON_FILENAME)
+        # Pre-load states of the project-toggle icon so clicks are cheap.
+        self.project_toggle_icon = _load_toggle_icon(PROJECT_TOGGLE_ICON_FILENAME)
 
         self.toggle_project_btn = platebtn.PlateButton(
-            self, bmp=self.project_toggle_icon_off
+            self, bmp=self.project_toggle_icon
         )
         self.toggle_project_btn.SetPressColor(wx.Colour(*STATUS_BUTTON_PRESS_COLOR))
 
@@ -84,13 +82,6 @@ class StatusPanel(wx.Panel):
 
     def on_toggle_sidebar(self, event: wx.CommandEvent | None) -> None:
         """Handle the toggle-project-panel button click."""
-        is_currently_off = (
-            self.toggle_project_btn.GetBitmapLabel() == self.project_toggle_icon_off
-        )
-        next_icon = (
-            self.project_toggle_icon_on if is_currently_off else self.project_toggle_icon_off
-        )
-        self.toggle_project_btn.SetBitmap(next_icon)
 
         if self.sidebar is not None:
             self.sidebar.toggle_visibility()

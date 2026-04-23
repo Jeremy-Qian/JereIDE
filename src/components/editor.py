@@ -80,6 +80,11 @@ class Editor(wx.stc.StyledTextCtrl):
     def register_modified_event(self, event_handler):
         self.Bind(wx.stc.EVT_STC_CHANGE, event_handler)
 
+    def _handle_margin_click(self, event):
+        line = self.LineFromPosition(event.GetPosition())
+        self.ToggleFold(line)
+        event.Skip()
+
     def _setup_editor(self):
         default_style_spec = build_default_style_spec()
         self.StyleSetSpec(wx.stc.STC_STYLE_DEFAULT, default_style_spec)
@@ -91,6 +96,7 @@ class Editor(wx.stc.StyledTextCtrl):
         apply_indentation_settings(self)
         configure_eol_and_whitespace(self)
         configure_fold_markers(self)
+        self.Bind(wx.stc.EVT_STC_MARGINCLICK, self._handle_margin_click)
 
         apply_python_syntax_styles(self)
         apply_caret_and_selection_styles(self)

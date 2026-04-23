@@ -237,11 +237,13 @@ def configure_margins(stc_control):
 
     stc_control.SetMarginType(LINE_NUMBER_MARGIN_ID, wx.stc.STC_MARGIN_NUMBER)
     stc_control.SetMarginWidth(LINE_NUMBER_MARGIN_ID, INITIAL_LINE_NUMBER_MARGIN_WIDTH_PX)
+    stc_control.SetMarginCursor(LINE_NUMBER_MARGIN_ID, -1)
 
     stc_control.SetMarginType(EDITOR_FOLD_MARGIN_ID, wx.stc.STC_MARGIN_SYMBOL)
     stc_control.SetMarginMask(EDITOR_FOLD_MARGIN_ID, wx.stc.STC_MASK_FOLDERS)
     stc_control.SetMarginSensitive(EDITOR_FOLD_MARGIN_ID, True)
     stc_control.SetMarginWidth(EDITOR_FOLD_MARGIN_ID, EDITOR_FOLD_MARGIN_WIDTH_PX)
+    stc_control.SetMarginCursor(EDITOR_FOLD_MARGIN_ID, -1)
 
 
 def apply_lexer_settings(stc_control):

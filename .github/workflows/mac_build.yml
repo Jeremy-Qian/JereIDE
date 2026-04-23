@@ -29,7 +29,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
+      - name: Test Run App
+        run: |
+          python3 src/JereIDE.py
       - name: Build with PyInstaller
         run: |
           # Use --windowed to create a .app bundle instead of just a binary
@@ -45,3 +47,7 @@ jobs:
         with:
           name: macos-app-bundle
           path: dist/*.app # Or dist/your_script if not using --windowed
+
+      - name: Test App
+        run: |
+          open dist/*.app

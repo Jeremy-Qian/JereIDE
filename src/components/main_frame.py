@@ -8,7 +8,7 @@ from components.editor import Editor
 from components.help_dialog import show_about_dialog
 from components.menu_builder import create_menu_bar
 from components.sidebar import SideBar
-from components.status_panel import StatusPanel
+from components.status_bar import StatusBar
 from constants import (
     DEFAULT_WINDOW_SIZE,
     MACOS_EDITED_SUFFIX,
@@ -37,22 +37,22 @@ class MainFrame(wx.Frame):
 
         self.sidebar = SideBar(self)
 
-        self.status_panel = StatusPanel(self)
-        self.status_panel.set_sidebar(self.sidebar)
-        self.status_panel.toggle_project_btn.Bind(
-            wx.EVT_BUTTON, self.status_panel.on_toggle_sidebar
+        self.status_bar = StatusBar(self)
+        self.status_bar.set_sidebar(self.sidebar)
+        self.status_bar.sidebar_toggle_btn.Bind(
+            wx.EVT_BUTTON, self.status_bar.on_toggle_sidebar
         )
 
         outer_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        # Content area: project panel on the left, editor taking the rest.
+        # Content area: sidebar on the left, editor taking the rest.
         content_sizer = wx.BoxSizer(wx.HORIZONTAL)
         content_sizer.Add(self.sidebar, 0, wx.EXPAND | wx.RIGHT, 5)
         content_sizer.Add(self.editor, 1, wx.EXPAND)
         outer_sizer.Add(content_sizer, 1, wx.EXPAND)
 
         # Status bar pinned to the bottom, spanning full width.
-        outer_sizer.Add(self.status_panel, 0, wx.EXPAND)
+        outer_sizer.Add(self.status_bar, 0, wx.EXPAND)
         self.SetSizer(outer_sizer)
 
         self.Centre()
@@ -68,8 +68,8 @@ class MainFrame(wx.Frame):
             event.Skip()
 
     def _on_update_ui(self, event: wx.Event) -> None:
-        """Refresh the status panel in response to caret/selection changes."""
-        self.status_panel.update_from_editor(self.editor)
+        """Refresh the status bar in response to caret/selection changes."""
+        self.status_bar.update_from_editor(self.editor)
         if event is not None:
             event.Skip()
 
@@ -88,7 +88,7 @@ class MainFrame(wx.Frame):
         self.has_unsaved_changes = False
         self._update_title()
         self.editor.update_line_number_margin()
-        self.status_panel.update_from_editor(self.editor)
+        self.status_bar.update_from_editor(self.editor)
 
     def on_save(self, event: wx.CommandEvent) -> None:
         """Handle the Save menu command."""

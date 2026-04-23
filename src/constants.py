@@ -114,7 +114,7 @@ MENU_HELP_LABEL = "&Help"
 MENU_ABOUT_LABEL = f"&About {APP_NAME}"
 
 # ---------------------------------------------------------------------------
-# Project panel
+# Sidebar
 # ---------------------------------------------------------------------------
 SIDEBAR_BG_COLOR = (240, 240, 240)
 SIDEBAR_MIN_WIDTH_PX = 200
@@ -122,17 +122,17 @@ SIDEBAR_PLACEHOLDER_TEXT = "Needs Implementation"
 SIDEBAR_PLACEHOLDER_FONT_SIZE = 12
 
 # ---------------------------------------------------------------------------
-# Status panel
+# Status bar
 # ---------------------------------------------------------------------------
-STATUS_PANEL_BG_COLOR = (220, 220, 220)
-STATUS_PANEL_HEIGHT_PX = 25
-STATUS_BUTTON_PRESS_COLOR = (200, 200, 200)
-INITIAL_STATUS_LABEL = "1:0"
+STATUS_BAR_BG_COLOR = (220, 220, 220)
+STATUS_BAR_HEIGHT_PX = 25
+STATUS_BAR_BUTTON_PRESS_COLOR = (200, 200, 200)
+INITIAL_CURSOR_POSITION_LABEL = "1:0"
 
 # ---------------------------------------------------------------------------
 # Icons
 # ---------------------------------------------------------------------------
 ICONS_DIR_NAME = "src/components/icons"
-PROJECT_TOGGLE_ICON_FILENAME = "sidebar.left.png"
-PROJECT_TOGGLE_ICON_WIDTH_PX = 20
-PROJECT_TOGGLE_ICON_HEIGHT_PX = 16
+SIDEBAR_TOGGLE_ICON_FILENAME = "sidebar.left.png"
+SIDEBAR_TOGGLE_ICON_WIDTH_PX = 20
+SIDEBAR_TOGGLE_ICON_HEIGHT_PX = 16

@@ -2,49 +2,49 @@ import wx
 import wx.lib.platebtn as platebtn
 
 from constants import (
-    INITIAL_STATUS_LABEL,
-    PROJECT_TOGGLE_ICON_HEIGHT_PX,
-    PROJECT_TOGGLE_ICON_FILENAME,
-    PROJECT_TOGGLE_ICON_WIDTH_PX,
-    STATUS_BUTTON_PRESS_COLOR,
-    STATUS_PANEL_BG_COLOR,
-    STATUS_PANEL_HEIGHT_PX,
+    INITIAL_CURSOR_POSITION_LABEL,
+    SIDEBAR_TOGGLE_ICON_HEIGHT_PX,
+    SIDEBAR_TOGGLE_ICON_FILENAME,
+    SIDEBAR_TOGGLE_ICON_WIDTH_PX,
+    STATUS_BAR_BUTTON_PRESS_COLOR,
+    STATUS_BAR_BG_COLOR,
+    STATUS_BAR_HEIGHT_PX,
 )
 from utils.paths import icon_path
 
 
-def _load_toggle_icon(icon_filename: str) -> wx.Bitmap:
-    """Load and rescale a project-toggle icon to the configured dimensions."""
+def _load_sidebar_toggle_icon(icon_filename: str) -> wx.Bitmap:
+    """Load and rescale a sidebar-toggle icon to the configured dimensions."""
     icon_image = wx.Image(icon_path(icon_filename))
-    icon_image.Rescale(PROJECT_TOGGLE_ICON_WIDTH_PX, PROJECT_TOGGLE_ICON_HEIGHT_PX)
+    icon_image.Rescale(SIDEBAR_TOGGLE_ICON_WIDTH_PX, SIDEBAR_TOGGLE_ICON_HEIGHT_PX)
     return wx.Bitmap(icon_image)
 
 
-class StatusPanel(wx.Panel):
+class StatusBar(wx.Panel):
     def __init__(self, parent):
-        """Initialize the status panel with a fixed height and line/column display."""
+        """Initialize the status bar with a fixed height and line/column display."""
         super().__init__(parent)
 
-        self.SetBackgroundColour(STATUS_PANEL_BG_COLOR)
+        self.SetBackgroundColour(STATUS_BAR_BG_COLOR)
 
         # Fix the height so the panel behaves like a traditional status bar.
-        self.SetMinSize((-1, STATUS_PANEL_HEIGHT_PX))
-        self.SetMaxSize((-1, STATUS_PANEL_HEIGHT_PX))
+        self.SetMinSize((-1, STATUS_BAR_HEIGHT_PX))
+        self.SetMaxSize((-1, STATUS_BAR_HEIGHT_PX))
 
-        # Pre-load states of the project-toggle icon so clicks are cheap.
-        self.project_toggle_icon = _load_toggle_icon(PROJECT_TOGGLE_ICON_FILENAME)
+        # Pre-load the sidebar-toggle icon so clicks are cheap.
+        self.sidebar_toggle_icon = _load_sidebar_toggle_icon(SIDEBAR_TOGGLE_ICON_FILENAME)
 
-        self.toggle_project_btn = platebtn.PlateButton(
-            self, bmp=self.project_toggle_icon
+        self.sidebar_toggle_btn = platebtn.PlateButton(
+            self, bmp=self.sidebar_toggle_icon
         )
-        self.toggle_project_btn.SetPressColor(wx.Colour(*STATUS_BUTTON_PRESS_COLOR))
+        self.sidebar_toggle_btn.SetPressColor(wx.Colour(*STATUS_BAR_BUTTON_PRESS_COLOR))
 
-        self.status_text = platebtn.PlateButton(self, label=INITIAL_STATUS_LABEL)
-        self.status_text.SetPressColor(wx.Colour(*STATUS_BUTTON_PRESS_COLOR))
+        self.text_indicator = platebtn.PlateButton(self, label=INITIAL_CURSOR_POSITION_LABEL)
+        self.text_indicator.SetPressColor(wx.Colour(*STATUS_BAR_BUTTON_PRESS_COLOR))
 
         layout_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        layout_sizer.Add(self.toggle_project_btn, 0, wx.LEFT | wx.RIGHT, 2)
-        layout_sizer.Add(self.status_text, 0, wx.LEFT, 0)
+        layout_sizer.Add(self.sidebar_toggle_btn, 0, wx.LEFT | wx.RIGHT, 2)
+        layout_sizer.Add(self.text_indicator, 0, wx.LEFT, 0)
         self.SetSizer(layout_sizer)
 
         # Populated later via set_sidebar().
@@ -57,7 +57,7 @@ class StatusPanel(wx.Panel):
             line_number: The current line number (1-indexed).
             column_number: The current column number (0-indexed).
         """
-        self.status_text.SetLabel(f"{line_number}:{column_number}")
+        self.text_indicator.SetLabel(f"{line_number}:{column_number}")
         # Force the button to resize to fit the new text.
         self.Layout()
 
@@ -73,7 +73,7 @@ class StatusPanel(wx.Panel):
         self.update_status(line_number, column_number)
 
     def set_sidebar(self, sidebar: wx.Panel) -> None:
-        """Set the project panel reference for toggling.
+        """Set the sidebar reference for toggling.
 
         Args:
             sidebar: The ``SideBar`` instance to toggle.
@@ -81,7 +81,7 @@ class StatusPanel(wx.Panel):
         self.sidebar = sidebar
 
     def on_toggle_sidebar(self, event: wx.CommandEvent | None) -> None:
-        """Handle the toggle-project-panel button click."""
+        """Handle the sidebar toggle button click."""
 
         if self.sidebar is not None:
             self.sidebar.toggle_visibility()

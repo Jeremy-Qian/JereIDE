@@ -10,7 +10,7 @@ from constants import (
 
 class SideBar(wx.Panel):
     def __init__(self, parent):
-        """Initialize the project panel as a collapsible side panel."""
+        """Initialize the sidebar as a collapsible side panel."""
         super().__init__(parent)
 
         self.SetBackgroundColour(SIDEBAR_BG_COLOR)

@@ -84,7 +84,8 @@ class Editor(wx.stc.StyledTextCtrl):
         default_style_spec = build_default_style_spec()
         self.StyleSetSpec(wx.stc.STC_STYLE_DEFAULT, default_style_spec)
         self.StyleClearAll()
-
+        self.SetUseHorizontalScrollBar(False)
+        self.SetWrapMode(wx.stc.STC_WRAP_WORD)
         apply_lexer_settings(self)
         configure_margins(self)
         apply_indentation_settings(self)

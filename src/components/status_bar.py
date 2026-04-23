@@ -16,7 +16,8 @@ from utils.paths import icon_path
 def _load_sidebar_toggle_icon(icon_filename: str) -> wx.Bitmap:
     """Load and rescale a sidebar-toggle icon to the configured dimensions."""
     icon_image = wx.Image(icon_path(icon_filename))
-    icon_image.Rescale(SIDEBAR_TOGGLE_ICON_WIDTH_PX, SIDEBAR_TOGGLE_ICON_HEIGHT_PX)
+    icon_image.Rescale(SIDEBAR_TOGGLE_ICON_WIDTH_PX, SIDEBAR_TOGGLE_ICON_HEIGHT_PX, quality=wx.IMAGE_QUALITY_BILINEAR)
+
     return wx.Bitmap(icon_image)
 
 

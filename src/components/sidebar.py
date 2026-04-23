@@ -1,26 +1,26 @@
 import wx
 
 from constants import (
-    PROJECT_PANEL_BG_COLOR,
-    PROJECT_PANEL_MIN_WIDTH_PX,
-    PROJECT_PANEL_PLACEHOLDER_FONT_SIZE,
-    PROJECT_PANEL_PLACEHOLDER_TEXT,
+    SIDEBAR_BG_COLOR,
+    SIDEBAR_MIN_WIDTH_PX,
+    SIDEBAR_PLACEHOLDER_FONT_SIZE,
+    SIDEBAR_PLACEHOLDER_TEXT,
 )
 
 
-class ProjectPanel(wx.Panel):
+class SideBar(wx.Panel):
     def __init__(self, parent):
         """Initialize the project panel as a collapsible side panel."""
         super().__init__(parent)
 
-        self.SetBackgroundColour(PROJECT_PANEL_BG_COLOR)
-        self.SetMinSize((PROJECT_PANEL_MIN_WIDTH_PX, -1))
+        self.SetBackgroundColour(SIDEBAR_BG_COLOR)
+        self.SetMinSize((SIDEBAR_MIN_WIDTH_PX, -1))
 
         self.placeholder_label = wx.StaticText(
-            self, label=PROJECT_PANEL_PLACEHOLDER_TEXT, style=wx.ALIGN_CENTER
+            self, label=SIDEBAR_PLACEHOLDER_TEXT, style=wx.ALIGN_CENTER
         )
         placeholder_font = self.placeholder_label.GetFont()
-        placeholder_font.PointSize = PROJECT_PANEL_PLACEHOLDER_FONT_SIZE
+        placeholder_font.PointSize = SIDEBAR_PLACEHOLDER_FONT_SIZE
         self.placeholder_label.SetFont(placeholder_font)
 
         layout_sizer = wx.BoxSizer(wx.VERTICAL)

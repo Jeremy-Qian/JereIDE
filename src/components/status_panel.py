@@ -49,8 +49,8 @@ class StatusPanel(wx.Panel):
         layout_sizer.Add(self.status_text, 0, wx.LEFT, 0)
         self.SetSizer(layout_sizer)
 
-        # Populated later via set_project_panel().
-        self.project_panel: wx.Panel | None = None
+        # Populated later via set_sidebar().
+        self.sidebar: wx.Panel | None = None
 
     def update_status(self, line_number: int, column_number: int) -> None:
         """Update the panel text with the current line and column.
@@ -74,15 +74,15 @@ class StatusPanel(wx.Panel):
         column_number = editor.GetColumn(cursor_position)
         self.update_status(line_number, column_number)
 
-    def set_project_panel(self, project_panel: wx.Panel) -> None:
+    def set_sidebar(self, sidebar: wx.Panel) -> None:
         """Set the project panel reference for toggling.
 
         Args:
-            project_panel: The ``ProjectPanel`` instance to toggle.
+            sidebar: The ``SideBar`` instance to toggle.
         """
-        self.project_panel = project_panel
+        self.sidebar = sidebar
 
-    def on_toggle_project_panel(self, event: wx.CommandEvent | None) -> None:
+    def on_toggle_sidebar(self, event: wx.CommandEvent | None) -> None:
         """Handle the toggle-project-panel button click."""
         is_currently_off = (
             self.toggle_project_btn.GetBitmapLabel() == self.project_toggle_icon_off
@@ -92,8 +92,8 @@ class StatusPanel(wx.Panel):
         )
         self.toggle_project_btn.SetBitmap(next_icon)
 
-        if self.project_panel is not None:
-            self.project_panel.toggle_visibility()
+        if self.sidebar is not None:
+            self.sidebar.toggle_visibility()
 
         if event is not None:
             event.Skip()

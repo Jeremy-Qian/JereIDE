@@ -7,7 +7,7 @@ import wx.stc
 from components.editor import Editor
 from components.help_dialog import show_about_dialog
 from components.menu_builder import create_menu_bar
-from components.project_panel import ProjectPanel
+from components.sidebar import SideBar
 from components.status_panel import StatusPanel
 from constants import (
     DEFAULT_WINDOW_SIZE,
@@ -35,19 +35,19 @@ class MainFrame(wx.Frame):
         self.editor.Bind(wx.stc.EVT_STC_CHANGE, self._on_text_change)
         self.editor.Bind(wx.stc.EVT_STC_UPDATEUI, self._on_update_ui)
 
-        self.project_panel = ProjectPanel(self)
+        self.sidebar = SideBar(self)
 
         self.status_panel = StatusPanel(self)
-        self.status_panel.set_project_panel(self.project_panel)
+        self.status_panel.set_sidebar(self.sidebar)
         self.status_panel.toggle_project_btn.Bind(
-            wx.EVT_BUTTON, self.status_panel.on_toggle_project_panel
+            wx.EVT_BUTTON, self.status_panel.on_toggle_sidebar
         )
 
         outer_sizer = wx.BoxSizer(wx.VERTICAL)
 
         # Content area: project panel on the left, editor taking the rest.
         content_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        content_sizer.Add(self.project_panel, 0, wx.EXPAND | wx.RIGHT, 5)
+        content_sizer.Add(self.sidebar, 0, wx.EXPAND | wx.RIGHT, 5)
         content_sizer.Add(self.editor, 1, wx.EXPAND)
         outer_sizer.Add(content_sizer, 1, wx.EXPAND)
 

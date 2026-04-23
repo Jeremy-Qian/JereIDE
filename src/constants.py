@@ -116,10 +116,10 @@ MENU_ABOUT_LABEL = f"&About {APP_NAME}"
 # ---------------------------------------------------------------------------
 # Project panel
 # ---------------------------------------------------------------------------
-PROJECT_PANEL_BG_COLOR = (240, 240, 240)
-PROJECT_PANEL_MIN_WIDTH_PX = 200
-PROJECT_PANEL_PLACEHOLDER_TEXT = "Needs Implementation"
-PROJECT_PANEL_PLACEHOLDER_FONT_SIZE = 12
+SIDEBAR_BG_COLOR = (240, 240, 240)
+SIDEBAR_MIN_WIDTH_PX = 200
+SIDEBAR_PLACEHOLDER_TEXT = "Needs Implementation"
+SIDEBAR_PLACEHOLDER_FONT_SIZE = 12
 
 # ---------------------------------------------------------------------------
 # Status panel

@@ -25,13 +25,73 @@ MACOS_EDITED_SUFFIX = " — Edited"
 OTHER_EDITED_SUFFIX = " •"
 
 # ---------------------------------------------------------------------------
-# Editor
+# Editor - Core
 # ---------------------------------------------------------------------------
 EDITOR_FONT_FACE = "Menlo"
 EDITOR_FONT_SIZE = 10
 LINE_NUMBER_MARGIN_ID = 1
 INITIAL_LINE_NUMBER_MARGIN_WIDTH_PX = 40
 LINE_NUMBER_MARGIN_PADDING_PX = 4
+
+# ---------------------------------------------------------------------------
+# Editor - Indentation
+# ---------------------------------------------------------------------------
+EDITOR_INDENT_SIZE = 4
+EDITOR_TAB_WIDTH = 4
+EDITOR_USE_TABS = False
+
+# ---------------------------------------------------------------------------
+# Editor - Margins
+# ---------------------------------------------------------------------------
+EDITOR_MARGIN_LEFT_PX = 2
+EDITOR_MARGIN_RIGHT_PX = 2
+EDITOR_FOLD_MARGIN_ID = 2
+EDITOR_FOLD_MARGIN_WIDTH_PX = 12
+
+# ---------------------------------------------------------------------------
+# Editor - Colors (STC Style Specs)
+# ---------------------------------------------------------------------------
+EDITOR_FG_COLOR_DEFAULT = "#000000"
+EDITOR_BG_COLOR_DEFAULT = "#FFFFFF"
+EDITOR_FG_COLOR_COMMENT = "#008000"
+EDITOR_BG_COLOR_COMMENT = "#F0FFF0"
+EDITOR_FG_COLOR_NUMBER = "#008080"
+EDITOR_FG_COLOR_STRING = "#800080"
+EDITOR_FG_COLOR_KEYWORD = "#000080"
+EDITOR_BG_COLOR_TRIPLE = "#FFFFEA"
+EDITOR_FG_COLOR_CLASSNAME = "#0000FF"
+EDITOR_FG_COLOR_DEFNAM = "#008080"
+EDITOR_FG_COLOR_OPERATOR = "#800000"
+EDITOR_FG_COLOR_IDENTIFIER = "#000000"
+EDITOR_FG_COLOR_LINENUMBER = "#000000"
+EDITOR_BG_COLOR_LINENUMBER = "#99A9C2"
+EDITOR_FG_COLOR_BRACELIGHT = "#00009D"
+EDITOR_BG_COLOR_BRACELIGHT = "#FFFF00"
+EDITOR_FG_COLOR_BRACEBAD = "#00009D"
+EDITOR_BG_COLOR_BRACEBAD = "#FF0000"
+EDITOR_FG_COLOR_INDENTGUIDE = "#CDCDCD"
+EDITOR_CARET_COLOR = "BLUE"
+EDITOR_SELECTION_COLOR = "#66CCFF"
+EDITOR_HIGHLIGHT_BG = None  # Uses system default
+EDITOR_HIGHLIGHT_FG = None  # Uses system default
+
+# ---------------------------------------------------------------------------
+# Editor - Fonts (Platform-specific)
+# ---------------------------------------------------------------------------
+EDITOR_FONT_FACE_WINDOWS = "Courier New"
+EDITOR_FONT_FACE_MAC = "Monaco"
+EDITOR_FONT_FACE_LINUX = "Courier"
+
+# ---------------------------------------------------------------------------
+# Editor - Caret
+# ---------------------------------------------------------------------------
+EDITOR_CARET_PERIOD_MS = 530
+
+# ---------------------------------------------------------------------------
+# Editor - Lexer Properties
+# ---------------------------------------------------------------------------
+EDITOR_FOLD_ENABLED = True
+EDITOR_TAB_WHINGE_LEVEL = "1"
 
 # ---------------------------------------------------------------------------
 # File dialog

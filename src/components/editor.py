@@ -21,8 +21,9 @@ from utils.editor_helpers import (
 
 
 class Editor(wx.stc.StyledTextCtrl):
-    def __init__(self, parent, style=wx.BORDER_NONE):
+    def __init__(self, parent, file_path: str | None = None, style=wx.BORDER_NONE):
         super().__init__(parent, style=style)
+        self.file_path = file_path
         self.line_numbers_enabled = True
         self._setup_editor()
 

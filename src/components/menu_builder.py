@@ -2,9 +2,12 @@ import wx
 
 from constants import (
     MENU_ABOUT_LABEL,
+    MENU_CLOSE_TAB_LABEL,
     MENU_FILE_LABEL,
     MENU_HELP_LABEL,
+    MENU_NEW_LABEL,
     MENU_OPEN_LABEL,
+    MENU_SAVE_AS_LABEL,
     MENU_SAVE_LABEL,
     MENU_TOGGLE_LINE_NUMBERS_LABEL,
     MENU_VIEW_LABEL,
@@ -22,11 +25,18 @@ def create_menu_bar(frame: wx.Frame) -> None:
 
     # ---- File menu -------------------------------------------------
     file_menu = wx.Menu()
+    new_menu_item = file_menu.Append(wx.ID_NEW, MENU_NEW_LABEL)
     open_menu_item = file_menu.Append(wx.ID_OPEN, MENU_OPEN_LABEL)
     save_menu_item = file_menu.Append(wx.ID_SAVE, MENU_SAVE_LABEL)
+    save_as_menu_item = file_menu.Append(wx.ID_SAVEAS, MENU_SAVE_AS_LABEL)
+    file_menu.AppendSeparator()
+    close_tab_menu_item = file_menu.Append(wx.ID_CLOSE, MENU_CLOSE_TAB_LABEL)
 
+    frame.Bind(wx.EVT_MENU, frame.on_new, new_menu_item)
     frame.Bind(wx.EVT_MENU, frame.on_open, open_menu_item)
     frame.Bind(wx.EVT_MENU, frame.on_save, save_menu_item)
+    frame.Bind(wx.EVT_MENU, frame.on_save_as, save_as_menu_item)
+    frame.Bind(wx.EVT_MENU, frame.on_close_tab, close_tab_menu_item)
 
     menu_bar.Append(file_menu, MENU_FILE_LABEL)
 

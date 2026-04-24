@@ -25,10 +25,10 @@ def _load_sidebar_toggle_icon(icon_filename: str) -> wx.Bitmap:
 
 
 class StatusBar(wx.Panel):
-    def __init__(self, parent, on_toggle_callback=None):
+    def __init__(self, parent, on_sidebar_toggle=None):
         """Initialize the status bar with a fixed height and line/column display."""
         super().__init__(parent)
-        self.on_toggle_callback = on_toggle_callback
+        self._on_sidebar_toggle_callback = on_sidebar_toggle
 
         self.SetBackgroundColour(wx.Colour(*STATUS_BAR_BG_COLOR))
 
@@ -44,12 +44,12 @@ class StatusBar(wx.Panel):
         )
         self.sidebar_toggle_btn.SetPressColor(wx.Colour(*STATUS_BAR_BUTTON_PRESS_COLOR))
 
-        self.text_indicator = platebtn.PlateButton(self, label=INITIAL_CURSOR_POSITION_LABEL)
-        self.text_indicator.SetPressColor(wx.Colour(*STATUS_BAR_BUTTON_PRESS_COLOR))
+        self.cursor_position_indicator = platebtn.PlateButton(self, label=INITIAL_CURSOR_POSITION_LABEL)
+        self.cursor_position_indicator.SetPressColor(wx.Colour(*STATUS_BAR_BUTTON_PRESS_COLOR))
 
         layout_sizer = wx.BoxSizer(wx.HORIZONTAL)
         layout_sizer.Add(self.sidebar_toggle_btn, 0, wx.LEFT | wx.RIGHT, 2)
-        layout_sizer.Add(self.text_indicator, 0, wx.LEFT, 0)
+        layout_sizer.Add(self.cursor_position_indicator, 0, wx.LEFT, 0)
         self.SetSizer(layout_sizer)
 
         # Populated later via set_sidebar().
@@ -62,11 +62,11 @@ class StatusBar(wx.Panel):
             line_number: The current line number (1-indexed).
             column_number: The current column number (0-indexed).
         """
-        self.text_indicator.SetLabel(f"{line_number}:{column_number}")
+        self.cursor_position_indicator.SetLabel(f"{line_number}:{column_number}")
         # Force the button to resize to fit the new text.
         self.Layout()
 
-    def update_from_editor(self, editor) -> None:
+    def update_from_editor(self, editor: wx.stc.StyledTextCtrl) -> None:
         """Extract line and column from a StyledTextCtrl and refresh the status.
 
         Args:
@@ -77,15 +77,15 @@ class StatusBar(wx.Panel):
         column_number = editor.GetColumn(cursor_position)
         self.update_status(line_number, column_number)
 
-    def set_sidebar(self, sidebar: wx.Panel, on_toggle_callback=None) -> None:
+    def set_sidebar(self, sidebar: wx.Panel, on_sidebar_toggle=None) -> None:
         """Set the sidebar reference for toggling.
 
         Args:
             sidebar: The ``SideBar`` instance to toggle.
-            on_toggle_callback: Optional callback to notify when sidebar is toggled.
+            on_sidebar_toggle: Optional callback to notify when sidebar is toggled.
         """
         self.sidebar = sidebar
-        self.on_toggle_callback = on_toggle_callback
+        self._on_sidebar_toggle_callback = on_sidebar_toggle
 
     def on_toggle_sidebar(self, event: wx.CommandEvent | None) -> None:
         """Handle the sidebar toggle button click."""
@@ -95,8 +95,8 @@ class StatusBar(wx.Panel):
             sidebar = cast(SideBar, self.sidebar)
             sidebar.toggle_visibility()
             # Call the toggle callback if provided
-            if self.on_toggle_callback:
-                self.on_toggle_callback(self.sidebar.IsShown())
+            if self._on_sidebar_toggle_callback:
+                self._on_sidebar_toggle_callback(self.sidebar.IsShown())
 
         if event is not None:
             event.Skip()

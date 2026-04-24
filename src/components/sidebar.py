@@ -15,18 +15,18 @@ class SideBar(wx.Panel):
 
         self.SetBackgroundColour(wx.Colour(*SIDEBAR_BG_COLOR))
         self.SetMinSize(wx.Size(SIDEBAR_MIN_WIDTH_PX, -1))
-        self.on_toggle_callback = on_toggle_callback
+        self.on_sidebar_toggle = on_toggle_callback
 
-        self.placeholder_label = wx.StaticText(
+        self.sidebar_placeholder_label = wx.StaticText(
             self, label=SIDEBAR_PLACEHOLDER_TEXT, style=wx.ALIGN_CENTER
         )
-        placeholder_font = self.placeholder_label.GetFont()
+        placeholder_font = self.sidebar_placeholder_label.GetFont()
         placeholder_font.PointSize = SIDEBAR_PLACEHOLDER_FONT_SIZE
-        self.placeholder_label.SetFont(placeholder_font)
+        self.sidebar_placeholder_label.SetFont(placeholder_font)
 
         layout_sizer = wx.BoxSizer(wx.VERTICAL)
         layout_sizer.AddStretchSpacer()
-        layout_sizer.Add(self.placeholder_label, 0, wx.ALIGN_CENTER)
+        layout_sizer.Add(self.sidebar_placeholder_label, 0, wx.ALIGN_CENTER)
         layout_sizer.AddStretchSpacer()
         self.SetSizer(layout_sizer)
 
@@ -35,12 +35,9 @@ class SideBar(wx.Panel):
 
     def toggle_visibility(self) -> None:
         """Toggle whether the panel is shown and re-layout the parent frame."""
-        if self.IsShown():
-            self.Hide()
-        else:
-            self.Show()
+        self.Show(not self.IsShown())
         self.GetParent().Layout()
         
         # Call the toggle callback if provided
-        if self.on_toggle_callback:
-            self.on_toggle_callback(self.IsShown())
+        if self.on_sidebar_toggle:
+            self.on_sidebar_toggle(self.IsShown())

@@ -36,19 +36,25 @@ class MainFrame(wx.Frame):
         self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self._on_page_changed)
         self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self._on_page_close)
 
-        self.sidebar = SideBar(self)
+        self.sidebar = SideBar(self, on_toggle_callback=self._on_sidebar_toggled)
 
-        self.status_bar = StatusBar(self)
-        self.status_bar.set_sidebar(self.sidebar)
+        self.status_bar = StatusBar(self, on_toggle_callback=self._on_sidebar_toggled)
+        self.status_bar.set_sidebar(self.sidebar, self._on_sidebar_toggled)
         self.status_bar.sidebar_toggle_btn.Bind(
             wx.EVT_BUTTON, self.status_bar.on_toggle_sidebar
         )
 
         outer_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        # Content area: sidebar on the left, notebook taking the rest.
+        # Content area: sidebar on the left, separator, and notebook taking the rest.
         content_sizer = wx.BoxSizer(wx.HORIZONTAL)
         content_sizer.Add(self.sidebar, 0, wx.EXPAND | wx.RIGHT, 5)
+        
+        # Add separator line that will be shown/hidden with the sidebar
+        self.sidebar_separator = wx.StaticLine(self, style=wx.LI_VERTICAL)
+        self.sidebar_separator.Hide()  # Start hidden since sidebar is hidden
+        content_sizer.Add(self.sidebar_separator, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
+        
         content_sizer.Add(self.notebook, 1, wx.EXPAND)
         outer_sizer.Add(content_sizer, 1, wx.EXPAND)
 
@@ -146,6 +152,11 @@ class MainFrame(wx.Frame):
         editor = self.get_current_editor()
         if editor:
             editor.toggle_line_numbers()
+
+    def _on_sidebar_toggled(self, is_shown: bool) -> None:
+        """Handle sidebar toggle - show/hide separator line accordingly."""
+        self.sidebar_separator.Show(is_shown)
+        self.Layout()
 
     def on_new(self, event: wx.CommandEvent | None) -> None:
         """Handle the New menu command."""

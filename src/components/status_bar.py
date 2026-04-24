@@ -1,6 +1,9 @@
+from typing import cast
+
 import wx
 import wx.lib.platebtn as platebtn
 
+from components.sidebar import SideBar
 from constants import (
     INITIAL_CURSOR_POSITION_LABEL,
     SIDEBAR_TOGGLE_ICON_HEIGHT_PX,
@@ -22,15 +25,16 @@ def _load_sidebar_toggle_icon(icon_filename: str) -> wx.Bitmap:
 
 
 class StatusBar(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, on_toggle_callback=None):
         """Initialize the status bar with a fixed height and line/column display."""
         super().__init__(parent)
+        self.on_toggle_callback = on_toggle_callback
 
-        self.SetBackgroundColour(STATUS_BAR_BG_COLOR)
+        self.SetBackgroundColour(wx.Colour(*STATUS_BAR_BG_COLOR))
 
         # Fix the height so the panel behaves like a traditional status bar.
-        self.SetMinSize((-1, STATUS_BAR_HEIGHT_PX))
-        self.SetMaxSize((-1, STATUS_BAR_HEIGHT_PX))
+        self.SetMinSize(wx.Size(-1, STATUS_BAR_HEIGHT_PX))
+        self.SetMaxSize(wx.Size(-1, STATUS_BAR_HEIGHT_PX))
 
         # Pre-load the sidebar-toggle icon so clicks are cheap.
         self.sidebar_toggle_icon = _load_sidebar_toggle_icon(SIDEBAR_TOGGLE_ICON_FILENAME)
@@ -73,19 +77,26 @@ class StatusBar(wx.Panel):
         column_number = editor.GetColumn(cursor_position)
         self.update_status(line_number, column_number)
 
-    def set_sidebar(self, sidebar: wx.Panel) -> None:
+    def set_sidebar(self, sidebar: wx.Panel, on_toggle_callback=None) -> None:
         """Set the sidebar reference for toggling.
 
         Args:
             sidebar: The ``SideBar`` instance to toggle.
+            on_toggle_callback: Optional callback to notify when sidebar is toggled.
         """
         self.sidebar = sidebar
+        self.on_toggle_callback = on_toggle_callback
 
     def on_toggle_sidebar(self, event: wx.CommandEvent | None) -> None:
         """Handle the sidebar toggle button click."""
 
         if self.sidebar is not None:
-            self.sidebar.toggle_visibility()
+            # Cast to the expected type to access toggle_visibility
+            sidebar = cast(SideBar, self.sidebar)
+            sidebar.toggle_visibility()
+            # Call the toggle callback if provided
+            if self.on_toggle_callback:
+                self.on_toggle_callback(self.sidebar.IsShown())
 
         if event is not None:
             event.Skip()

@@ -100,8 +100,11 @@ SAVE_DIALOG_TITLE = "Save file as"
 # Menu labels
 # ---------------------------------------------------------------------------
 MENU_FILE_LABEL = "&File"
+MENU_NEW_LABEL = "&New\tCtrl+N"
 MENU_OPEN_LABEL = "&Open...\tCtrl+O"
 MENU_SAVE_LABEL = "&Save\tCtrl+S"
+MENU_SAVE_AS_LABEL = "Save &As...\tCtrl+Shift+S"
+MENU_CLOSE_TAB_LABEL = "&Close Tab\tCtrl+W"
 
 MENU_VIEW_LABEL = "&View"
 MENU_TOGGLE_LINE_NUMBERS_LABEL = "Toggle &Line Numbers"

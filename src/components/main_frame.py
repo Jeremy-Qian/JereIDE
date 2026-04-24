@@ -36,9 +36,9 @@ class MainFrame(wx.Frame):
         self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self._on_page_changed)
         self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self._on_page_close)
 
-        self.sidebar = SideBar(self, on_toggle_callback=self._on_sidebar_toggled)
+        self.sidebar = SideBar(self, on_sidebar_toggle=self._on_sidebar_toggled)
 
-        self.status_bar = StatusBar(self, on_toggle_callback=self._on_sidebar_toggled)
+        self.status_bar = StatusBar(self, on_sidebar_toggle=self._on_sidebar_toggled)
         self.status_bar.set_sidebar(self.sidebar, self._on_sidebar_toggled)
         self.status_bar.sidebar_toggle_btn.Bind(
             wx.EVT_BUTTON, self.status_bar.on_toggle_sidebar

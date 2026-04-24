@@ -22,12 +22,10 @@ APP_COPYRIGHT = "Copyright (C) 2026 Jeremy-Qian"
 DEFAULT_WINDOW_SIZE = (800, 600)
 UNTITLED_NAME = "Untitled"
 MACOS_EDITED_SUFFIX = " — Edited"
-OTHER_EDITED_SUFFIX = " •"
 
 # ---------------------------------------------------------------------------
 # Editor - Core
 # ---------------------------------------------------------------------------
-EDITOR_FONT_FACE = "Menlo"
 EDITOR_FONT_SIZE = 10
 LINE_NUMBER_MARGIN_ID = 1
 INITIAL_LINE_NUMBER_MARGIN_WIDTH_PX = 11
@@ -78,9 +76,7 @@ EDITOR_HIGHLIGHT_FG = None  # Uses system default
 # ---------------------------------------------------------------------------
 # Editor - Fonts (Platform-specific)
 # ---------------------------------------------------------------------------
-EDITOR_FONT_FACE_WINDOWS = "Courier New"
 EDITOR_FONT_FACE_MAC = "Monaco"
-EDITOR_FONT_FACE_LINUX = "Courier"
 
 # ---------------------------------------------------------------------------
 # Editor - Caret

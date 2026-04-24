@@ -1,5 +1,4 @@
 import os
-import sys
 
 import wx
 import wx.stc
@@ -12,7 +11,6 @@ from components.status_bar import StatusBar
 from constants import (
     DEFAULT_WINDOW_SIZE,
     MACOS_EDITED_SUFFIX,
-    OTHER_EDITED_SUFFIX,
     UNTITLED_NAME,
 )
 from utils.file_io import open_file, save_file
@@ -107,25 +105,17 @@ class MainFrame(wx.Frame):
     # ------------------------------------------------------------------ title
     def _update_title(self) -> None:
         """Update the window title to reflect file name and modification status."""
-        is_macos = sys.platform == "darwin"
-
         if self.current_file_path:
             display_title = os.path.basename(self.current_file_path)
-            if is_macos:
-                self.SetRepresentedFilename(self.current_file_path)
+            self.SetRepresentedFilename(self.current_file_path)
         else:
             display_title = UNTITLED_NAME
-            if is_macos:
-                self.SetRepresentedFilename("")
+            self.SetRepresentedFilename("")
 
         if self.has_unsaved_changes:
-            if is_macos:
-                # Use the native macOS "dirty" indicator (dot in the close button).
-                self.OSXSetModified(True)
-                display_title += MACOS_EDITED_SUFFIX
-            else:
-                display_title += OTHER_EDITED_SUFFIX
-        elif is_macos:
+            self.OSXSetModified(True)
+            display_title += MACOS_EDITED_SUFFIX
+        else:
             self.OSXSetModified(False)
 
         self.SetTitle(display_title)

@@ -1,7 +1,7 @@
 """Editor utility functions for styling, keywords, and configuration helpers."""
 
 import keyword
-import wx
+
 import wx.stc
 
 from constants import (
@@ -23,28 +23,20 @@ from constants import (
     EDITOR_FG_COLOR_NUMBER,
     EDITOR_FG_COLOR_OPERATOR,
     EDITOR_FG_COLOR_STRING,
-    EDITOR_FONT_FACE_LINUX,
     EDITOR_FONT_FACE_MAC,
-    EDITOR_FONT_FACE_WINDOWS,
     EDITOR_FG_COLOR_IDENTIFIER,
 )
 
 
 def get_editor_font_face():
     """Get the appropriate font face for the current platform."""
-    if wx.Platform == '__WXMSW__':
-        return EDITOR_FONT_FACE_WINDOWS
-    elif wx.Platform == '__WXMAC__':
-        return EDITOR_FONT_FACE_MAC
-    else:
-        return EDITOR_FONT_FACE_LINUX
+    from constants import EDITOR_FONT_FACE_MAC
+    return EDITOR_FONT_FACE_MAC
 
 
 def get_editor_font_size():
     """Get the default font size for the editor."""
     from constants import EDITOR_FONT_SIZE
-    if wx.Platform not in ('__WXMSW__', '__WXMAC__'):
-        return wx.SystemSettings.GetFont(wx.SYS_ANSI_FIXED_FONT).GetPointSize()
     return EDITOR_FONT_SIZE
 
 

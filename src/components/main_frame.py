@@ -8,7 +8,7 @@ import wx.stc
 from components.editor import Editor
 from components.find_replace_dialog import show_find_dialog, show_replace_dialog
 from components.help_dialog import show_about_dialog
-from components.menu_builder import create_menu_bar
+from components.menu import create_menu_bar
 from components.sidebar import SideBar
 from components.status_bar import StatusBar
 from constants import (

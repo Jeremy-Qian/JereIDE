@@ -1,11 +1,25 @@
+import os
 import wx
 
 from constants import (
+    BUTTON_ICON_HEIGHT_PX,
+    BUTTON_ICON_WIDTH_PX,
+    GIT_ICON_FILENAME,
+    ICONS_DIR_NAME,
+    PROJECT_ICON_FILENAME,
     SIDEBAR_BG_COLOR,
     SIDEBAR_MIN_WIDTH_PX,
     SIDEBAR_PLACEHOLDER_FONT_SIZE,
     SIDEBAR_PLACEHOLDER_TEXT,
 )
+
+
+def _load_button_icon(icon_filename: str) -> wx.Bitmap:
+    """Load and rescale a button icon to the configured dimensions."""
+    icon_path = os.path.join(ICONS_DIR_NAME, icon_filename)
+    icon_image = wx.Image(icon_path)
+    icon_image.Rescale(BUTTON_ICON_WIDTH_PX, BUTTON_ICON_HEIGHT_PX, quality=wx.IMAGE_QUALITY_BICUBIC)
+    return wx.Bitmap(icon_image)
 
 
 class SideBar(wx.Panel):
@@ -25,15 +39,23 @@ class SideBar(wx.Panel):
 
         # Top panel with two action buttons
         self.top_panel = wx.Panel(self)
-        btn_build = wx.Button(self.top_panel, label="Project", style=wx.BORDER_NONE)
-        btn_run = wx.Button(self.top_panel, label="Git", style=wx.BORDER_NONE)
+        btn_build = wx.BitmapButton(self.top_panel, style=wx.BORDER_NONE)
+        btn_run = wx.BitmapButton(self.top_panel, style=wx.BORDER_NONE)
 
-        btn_build.Bind(wx.EVT_BUTTON, self._on_build)
-        btn_run.Bind(wx.EVT_BUTTON, self._on_run)
+        # Load and set icons for buttons
+        project_icon = _load_button_icon(PROJECT_ICON_FILENAME)
+        git_icon = _load_button_icon(GIT_ICON_FILENAME)
+        btn_build.SetBitmap(project_icon)
+        btn_run.SetBitmap(git_icon)
+
+        btn_build.Bind(wx.EVT_BUTTON, self._on_project)
+        btn_run.Bind(wx.EVT_BUTTON, self._on_git)
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        top_sizer.Add(btn_build, proportion=1, flag=wx.EXPAND | wx.ALL, border=5)
-        top_sizer.Add(btn_run, proportion=1, flag=wx.EXPAND | wx.ALL, border=5)
+        top_sizer.AddStretchSpacer()
+        top_sizer.Add(btn_build, 0, wx.ALL, border=5)
+        top_sizer.Add(btn_run, 0, wx.ALL, border=5)
+        top_sizer.AddStretchSpacer()
         self.top_panel.SetSizer(top_sizer)
 
         # Bottom panel with placeholder text (unchanged)
@@ -71,10 +93,10 @@ class SideBar(wx.Panel):
         if self.on_sidebar_toggle:
             self.on_sidebar_toggle(self.IsShown())
 
-    def _on_build(self, event: wx.CommandEvent) -> None:
-        """Placeholder action for the Build button."""
-        wx.MessageBox("Build not implemented yet.", "Sidebar", wx.OK | wx.ICON_INFORMATION, self)
+    def _on_project(self, event: wx.CommandEvent) -> None:
+        """Placeholder action for the Project button."""
+        pass
 
-    def _on_run(self, event: wx.CommandEvent) -> None:
-        """Placeholder action for the Run button."""
-        wx.MessageBox("Run not implemented yet.", "Sidebar", wx.OK | wx.ICON_INFORMATION, self)
+    def _on_git(self, event: wx.CommandEvent) -> None:
+        """Placeholder action for the Git button."""
+        pass

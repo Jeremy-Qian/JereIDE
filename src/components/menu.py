@@ -46,9 +46,15 @@ def create_menu_bar(frame: wx.Frame) -> None:
 
     # ---- Edit menu -------------------------------------------------
     edit_menu = wx.Menu()
+    # edit_menu.Append(wx.ID_ANY, "Undo")
+    # edit_menu.Append(wx.ID_ANY, "Redo")
+    # edit_menu.Append(wx.ID_ANY, "Cut")
+    # edit_menu.Append(wx.ID_ANY, "Copy")
+    # edit_menu.Append(wx.ID_ANY, "Paste")
+
+    edit_menu.AppendSeparator()
     find_menu_item = edit_menu.Append(wx.ID_ANY, MENU_FIND_LABEL)
     find_next_menu_item = edit_menu.Append(wx.ID_ANY, MENU_FIND_NEXT_LABEL)
-    edit_menu.AppendSeparator()
     replace_menu_item = edit_menu.Append(wx.ID_ANY, MENU_REPLACE_LABEL)
 
     frame.Bind(wx.EVT_MENU, frame.on_find, find_menu_item)

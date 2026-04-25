@@ -40,26 +40,26 @@ class SideBar(wx.Panel):
 
         # Top panel with two action buttons
         self.top_panel = wx.Panel(self)
-        btn_build = wx.BitmapButton(self.top_panel, style=wx.BORDER_NONE)
-        btn_run = wx.BitmapButton(self.top_panel, style=wx.BORDER_NONE)
+        btn_project = wx.BitmapButton(self.top_panel, style=wx.BORDER_NONE)
+        btn_git = wx.BitmapButton(self.top_panel, style=wx.BORDER_NONE)
         btn_search = wx.BitmapButton(self.top_panel, style=wx.BORDER_NONE)
 
         # Load and set icons for buttons
         project_icon = _load_button_icon(PROJECT_ICON_FILENAME)
         git_icon = _load_button_icon(GIT_ICON_FILENAME)
         search_icon = _load_button_icon(SEARCH_ICON_FILENAME)
-        btn_build.SetBitmap(project_icon)
-        btn_run.SetBitmap(git_icon)
+        btn_project.SetBitmap(project_icon)
+        btn_git.SetBitmap(git_icon)
         btn_search.SetBitmap(search_icon)
 
-        btn_build.Bind(wx.EVT_BUTTON, self._on_project)
-        btn_run.Bind(wx.EVT_BUTTON, self._on_git)
+        btn_project.Bind(wx.EVT_BUTTON, self._on_project)
+        btn_git.Bind(wx.EVT_BUTTON, self._on_git)
         btn_search.Bind(wx.EVT_BUTTON, self._on_search)
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
         top_sizer.AddStretchSpacer()
-        top_sizer.Add(btn_build, 0, wx.ALL, border=5)
-        top_sizer.Add(btn_run, 0, wx.ALL, border=5)
+        top_sizer.Add(btn_project, 0, wx.ALL, border=5)
+        top_sizer.Add(btn_git, 0, wx.ALL, border=5)
         top_sizer.Add(btn_search, 0, wx.ALL, border=5)
         top_sizer.AddStretchSpacer()
         self.top_panel.SetSizer(top_sizer)

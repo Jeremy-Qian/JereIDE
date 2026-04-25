@@ -13,6 +13,7 @@ from constants import (
     SIDEBAR_PLACEHOLDER_FONT_SIZE,
     SIDEBAR_PLACEHOLDER_TEXT,
 )
+from components.find_replace_dialog import show_find_dialog
 
 
 def _load_button_icon(icon_filename: str) -> wx.Bitmap:
@@ -24,15 +25,16 @@ def _load_button_icon(icon_filename: str) -> wx.Bitmap:
 
 
 class SideBar(wx.Panel):
-    def __init__(self, parent, on_sidebar_toggle=None):
+    def __init__(self, main_frame, on_sidebar_toggle=None):
         """Initialize the sidebar as two stacked panels:
         - Top panel with two horizontally arranged action buttons
         - Bottom panel containing a placeholder label (unchanged)
         The top panel has a fixed height (driven by its content), and the bottom
         panel expands to fill the remaining space.
         """
-        super().__init__(parent)
+        super().__init__(main_frame)
 
+        self.main_frame = main_frame
         self.SetBackgroundColour(wx.Colour(*SIDEBAR_BG_COLOR))
         self.SetMinSize(wx.Size(SIDEBAR_MIN_WIDTH_PX, -1))
         self.SetMaxSize(wx.Size(SIDEBAR_MIN_WIDTH_PX, -1))
@@ -104,8 +106,10 @@ class SideBar(wx.Panel):
         pass
 
     def _on_search(self, event: wx.CommandEvent) -> None:
-        """Placeholder action for the Search button."""
-        pass
+        """Handle the Search button click."""
+        editor = self.main_frame.get_current_editor()
+        if editor:
+            show_find_dialog(self.main_frame, editor)
 
     def _on_git(self, event: wx.CommandEvent) -> None:
         """Placeholder action for the Git button."""

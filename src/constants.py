@@ -106,6 +106,11 @@ MENU_SAVE_LABEL = "&Save\tCtrl+S"
 MENU_SAVE_AS_LABEL = "Save &As...\tCtrl+Shift+S"
 MENU_CLOSE_TAB_LABEL = "&Close Tab\tCtrl+W"
 
+MENU_EDIT_LABEL = "&Edit"
+MENU_FIND_LABEL = "&Find...\tCtrl+F"
+MENU_FIND_NEXT_LABEL = "Find &Next\tF3"
+MENU_REPLACE_LABEL = "&Replace...\tCtrl+H"
+
 MENU_VIEW_LABEL = "&View"
 MENU_TOGGLE_LINE_NUMBERS_LABEL = "Toggle &Line Numbers"
 

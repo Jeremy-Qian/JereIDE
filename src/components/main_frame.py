@@ -6,6 +6,7 @@ import wx.aui
 import wx.stc
 
 from components.editor import Editor
+from components.find_replace_dialog import show_find_dialog, show_replace_dialog
 from components.help_dialog import show_about_dialog
 from components.menu_builder import create_menu_bar
 from components.sidebar import SideBar
@@ -23,7 +24,7 @@ class MainFrame(wx.Frame):
         # Use wx.Size for the window dimensions to satisfy type checking.
         super().__init__(parent, title=title, size=wx.Size(*DEFAULT_WINDOW_SIZE))
         self._init_ui()
-        
+
         # Open an initial empty tab
         self.on_new(None)
 
@@ -49,12 +50,12 @@ class MainFrame(wx.Frame):
         # Content area: sidebar on the left, separator, and notebook taking the rest.
         content_sizer = wx.BoxSizer(wx.HORIZONTAL)
         content_sizer.Add(self.sidebar, 0, wx.EXPAND | wx.RIGHT, 5)
-        
+
         # Add separator line that will be shown/hidden with the sidebar
         self.sidebar_separator = wx.StaticLine(self, style=wx.LI_VERTICAL)
         self.sidebar_separator.Hide()  # Start hidden since sidebar is hidden
         content_sizer.Add(self.sidebar_separator, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        
+
         content_sizer.Add(self.notebook, 1, wx.EXPAND)
         outer_sizer.Add(content_sizer, 1, wx.EXPAND)
 
@@ -77,13 +78,13 @@ class MainFrame(wx.Frame):
         editor = Editor(self.notebook, file_path=path)
         editor.SetValue(content)
         editor.EmptyUndoBuffer()
-        
+
         editor.Bind(wx.stc.EVT_STC_CHANGE, self._on_text_change)
         editor.Bind(wx.stc.EVT_STC_UPDATEUI, self._on_update_ui)
-        
+
         display_name = os.path.basename(path) if path else UNTITLED_NAME
         self.notebook.AddPage(editor, display_name, select=True)
-        
+
         editor.update_line_number_margin()
         self._update_title()
 
@@ -101,7 +102,7 @@ class MainFrame(wx.Frame):
         """Handle tab closure, checking for unsaved changes."""
         idx = event.GetSelection()
         editor = cast(Editor, self.notebook.GetPage(idx))
-        
+
         if editor.GetModify():
             res = wx.MessageBox(
                 "File has unsaved changes. Save before closing?",
@@ -118,7 +119,7 @@ class MainFrame(wx.Frame):
             elif res == wx.CANCEL:
                 event.Veto()
                 return
-        
+
         # If last page is closed, we might want to open a new one or keep it empty
         # AuiNotebook handles the removal if not vetoed.
 
@@ -169,7 +170,7 @@ class MainFrame(wx.Frame):
             return
         if result.path is None:
             return
-        
+
         # Check if already open
         for i in range(self.notebook.GetPageCount()):
             page = cast(Editor, self.notebook.GetPage(i))
@@ -198,11 +199,46 @@ class MainFrame(wx.Frame):
             # This triggers EVT_AUINOTEBOOK_PAGE_CLOSE
             self.notebook.DeletePage(selection)
 
+    # ------------------------------------------------------------------ Find/Replace
+    def on_find(self, event: wx.CommandEvent) -> None:
+        """Handle the Find menu command (Ctrl+F)."""
+        editor = self.get_current_editor()
+        if editor:
+            show_find_dialog(self, editor)
+
+    def on_find_next(self, event: wx.CommandEvent) -> None:
+        """Handle the Find Next menu command (F3)."""
+        editor = self.get_current_editor()
+        if editor:
+            # Use the last search if there's a selection
+            selected_text = editor.GetSelectedText()
+            if selected_text:
+                editor.SetSearchFlags(0)
+                editor.SetTargetStart(editor.GetSelectionEnd())
+                editor.SetTargetEnd(editor.GetLength())
+                pos = editor.SearchInTarget(selected_text)
+                if pos == -1:
+                    # Wrap around
+                    editor.SetTargetStart(0)
+                    editor.SetTargetEnd(editor.GetLength())
+                    pos = editor.SearchInTarget(selected_text)
+                if pos != -1:
+                    editor.GotoPos(pos)
+                    editor.SetSelectionStart(pos)
+                    editor.SetSelectionEnd(pos + len(selected_text))
+
+    def on_replace(self, event: wx.CommandEvent) -> None:
+        """Handle the Replace menu command (Ctrl+H)."""
+        editor = self.get_current_editor()
+        if editor:
+            show_replace_dialog(self, editor)
+
+    # ------------------------------------------------------------------ save
     def _save_editor(self, editor: Editor, force_dialog: bool = False) -> bool:
         """Internal helper to save a specific editor's content."""
         path_to_save = None if force_dialog else editor.file_path
         result = save_file(self, path_to_save, editor.GetText())
-        
+
         if not result.success:
             return False
 

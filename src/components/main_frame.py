@@ -15,7 +15,7 @@ from constants import (
     MACOS_EDITED_SUFFIX,
     UNTITLED_NAME,
 )
-from utils.file_io import open_file, save_file
+from utils.file_io import open_file, save_file, FileOperationResult
 
 
 class MainFrame(wx.Frame):
@@ -164,18 +164,20 @@ class MainFrame(wx.Frame):
 
     def on_open(self, event: wx.CommandEvent) -> None:
         """Handle the Open menu command."""
-        opened_path, opened_content = open_file(self)
-        if opened_path is None:
+        result = open_file(self)
+        if not result.success:
+            return
+        if result.path is None:
             return
         
         # Check if already open
         for i in range(self.notebook.GetPageCount()):
             page = cast(Editor, self.notebook.GetPage(i))
-            if page.file_path == opened_path:
+            if page.file_path == result.path:
                 self.notebook.SetSelection(i)
                 return
 
-        self.add_new_tab(opened_path, opened_content or "")
+        self.add_new_tab(result.path, result.content or "")
 
     def on_save(self, event: wx.CommandEvent) -> None:
         """Handle the Save menu command."""
@@ -199,14 +201,14 @@ class MainFrame(wx.Frame):
     def _save_editor(self, editor: Editor, force_dialog: bool = False) -> bool:
         """Internal helper to save a specific editor's content."""
         path_to_save = None if force_dialog else editor.file_path
-        saved_path = save_file(self, path_to_save, editor.GetText())
+        result = save_file(self, path_to_save, editor.GetText())
         
-        if not saved_path:
+        if not result.success:
             return False
 
-        editor.file_path = saved_path
+        editor.file_path = result.path
         editor.SetSavePoint()
-        self.notebook.SetPageText(self.notebook.GetPageIndex(editor), os.path.basename(saved_path))
+        self.notebook.SetPageText(self.notebook.GetPageIndex(editor), os.path.basename(result.path or ""))
         self._update_title()
         return True
 

@@ -9,13 +9,13 @@ from constants import (
 
 
 class SideBar(wx.Panel):
-    def __init__(self, parent, on_toggle_callback=None):
+    def __init__(self, parent, on_sidebar_toggle=None):
         """Initialize the sidebar as a collapsible side panel."""
         super().__init__(parent)
 
         self.SetBackgroundColour(wx.Colour(*SIDEBAR_BG_COLOR))
         self.SetMinSize(wx.Size(SIDEBAR_MIN_WIDTH_PX, -1))
-        self.on_sidebar_toggle = on_toggle_callback
+        self.on_sidebar_toggle = on_sidebar_toggle
 
         self.sidebar_placeholder_label = wx.StaticText(
             self, label=SIDEBAR_PLACEHOLDER_TEXT, style=wx.ALIGN_CENTER

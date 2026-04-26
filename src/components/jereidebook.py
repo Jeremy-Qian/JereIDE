@@ -14,10 +14,15 @@ class JereIDETab(wx.Control):
         self.is_selected = False
 
         self.close_rect = wx.Rect(0, 0, 5, 5)
+        self.is_close_hovered = False
+        self._close_hover_rect = wx.Rect(0, 0, 15, 15)
 
         self.SetInitialSize((120, 30))
+        self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_UP, self.OnMouseClick)
+        self.Bind(wx.EVT_MOTION, self.OnMouseMove)
+        self.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeaveWindow)
 
     def OnPaint(self, event: wx.PaintEvent) -> None:
         dc = wx.PaintDC(self)
@@ -32,15 +37,36 @@ class JereIDETab(wx.Control):
         dc.SetTextForeground(wx.BLACK)
         dc.DrawText(self.label, 10, (h // 2) - 8)
 
-        self.close_rect.SetPosition((w - 15, (h // 2) - 3))
+        close_x = w - 15
+        close_y = (h // 2) - 3
+        self.close_rect.SetPosition((close_x, close_y))
+        self._close_hover_rect.SetPosition((close_x - 5, close_y - 5))
+
+        if self.is_close_hovered:
+            dc.SetBrush(wx.Brush(wx.Colour(220, 220, 220)))
+            dc.SetPen(wx.TRANSPARENT_PEN)
+            r = self._close_hover_rect
+            dc.DrawRoundedRectangle(r.x, r.y, r.width, r.height, 3)
+
         dc.SetPen(wx.Pen(wx.BLACK, 2))
         r = self.close_rect
         dc.DrawLine(r.x, r.y, r.x + r.width, r.y + r.height)
         dc.DrawLine(r.x + r.width, r.y, r.x, r.y + r.height)
 
+    def OnMouseMove(self, event: wx.MouseEvent) -> None:
+        pos = event.GetPosition()
+        was_hovered = self.is_close_hovered
+        self.is_close_hovered = self._close_hover_rect.Contains(pos)
+        if was_hovered != self.is_close_hovered:
+            self.Refresh()
+
+    def OnLeaveWindow(self, event: wx.WindowEvent) -> None:
+        self.is_close_hovered = False
+        self.Refresh()
+
     def OnMouseClick(self, event: wx.MouseEvent) -> None:
         pos = event.GetPosition()
-        if self.close_rect.Contains(pos):
+        if self._close_hover_rect.Contains(pos):
             self.GetParent().CloseTab(self.index)
         else:
             self.GetParent().SelectTab(self.index)

@@ -2,12 +2,12 @@ import os
 from typing import cast
 
 import wx
-import wx.aui
 import wx.stc
 
 from components.editor import Editor
 from components.find_replace_dialog import show_find_dialog, show_replace_dialog
 from components.help_dialog import show_about_dialog
+from components.jereidebook import JereIDEBook
 from components.menu import create_menu_bar
 from components.sidebar import SideBar
 from components.status_bar import StatusBar
@@ -32,10 +32,7 @@ class MainFrame(wx.Frame):
         """Initialize the UI components and layout."""
         create_menu_bar(self)
 
-        # Initialize the Notebook for tabs
-        self.notebook = wx.aui.AuiNotebook(self, style=wx.aui.AUI_NB_DEFAULT_STYLE | wx.aui.AUI_NB_CLOSE_ON_ALL_TABS)
-        self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self._on_page_changed)
-        self.notebook.Bind(wx.aui.EVT_AUINOTEBOOK_PAGE_CLOSE, self._on_page_close)
+        self.notebook = JereIDEBook(self)
 
         self.sidebar = SideBar(self, on_sidebar_toggle=self._on_sidebar_toggled)
 
@@ -89,7 +86,7 @@ class MainFrame(wx.Frame):
         self._update_title()
 
     # ------------------------------------------------------------------ events
-    def _on_page_changed(self, event: wx.aui.AuiNotebookEvent) -> None:
+    def _on_page_changed(self, event: wx.CommandEvent) -> None:
         """Update window title and status bar when switching tabs."""
         editor = self.get_current_editor()
         if editor:
@@ -98,7 +95,7 @@ class MainFrame(wx.Frame):
         if event is not None:
             event.Skip()
 
-    def _on_page_close(self, event: wx.aui.AuiNotebookEvent) -> None:
+    def _on_page_close(self, event: wx.CommandEvent) -> None:
         """Handle tab closure, checking for unsaved changes."""
         idx = event.GetSelection()
         editor = cast(Editor, self.notebook.GetPage(idx))

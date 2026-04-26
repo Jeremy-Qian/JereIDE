@@ -1,4 +1,6 @@
-import wx
+"""Menu bar creation for JereIDE."""
+
+from PySide6.QtWidgets import QMenuBar, QMenu
 
 from constants import (
     MENU_ABOUT_LABEL,
@@ -18,69 +20,61 @@ from constants import (
 )
 
 
-def create_menu_bar(frame: wx.Frame) -> None:
-    """Construct the menu bar for the JereIDE main frame and bind menu events.
+def create_menu_bar(window) -> QMenuBar:
+    """Construct the menu bar for the JereIDE main window and bind menu events.
 
     Args:
-        frame: The MainFrame instance to which the menu bar will be attached
-            and whose event handlers will be bound.
+        window: The MainFrame instance whose event handlers will be bound.
+    
+    Returns:
+        The created QMenuBar instance.
     """
-    menu_bar = wx.MenuBar()
+    menu_bar = QMenuBar()
 
     # ---- File menu -------------------------------------------------
-    file_menu = wx.Menu()
-    new_menu_item = file_menu.Append(wx.ID_NEW, MENU_NEW_LABEL)
-    open_menu_item = file_menu.Append(wx.ID_OPEN, MENU_OPEN_LABEL)
-    save_menu_item = file_menu.Append(wx.ID_SAVE, MENU_SAVE_LABEL)
-    save_as_menu_item = file_menu.Append(wx.ID_SAVEAS, MENU_SAVE_AS_LABEL)
-    file_menu.AppendSeparator()
-    close_tab_menu_item = file_menu.Append(wx.ID_CLOSE, MENU_CLOSE_TAB_LABEL)
+    file_menu = QMenu(MENU_FILE_LABEL, menu_bar)
+    new_action = file_menu.addAction(MENU_NEW_LABEL)
+    open_action = file_menu.addAction(MENU_OPEN_LABEL)
+    save_action = file_menu.addAction(MENU_SAVE_LABEL)
+    save_as_action = file_menu.addAction(MENU_SAVE_AS_LABEL)
+    file_menu.addSeparator()
+    close_tab_action = file_menu.addAction(MENU_CLOSE_TAB_LABEL)
 
-    frame.Bind(wx.EVT_MENU, frame.on_new, new_menu_item)
-    frame.Bind(wx.EVT_MENU, frame.on_open, open_menu_item)
-    frame.Bind(wx.EVT_MENU, frame.on_save, save_menu_item)
-    frame.Bind(wx.EVT_MENU, frame.on_save_as, save_as_menu_item)
-    frame.Bind(wx.EVT_MENU, frame.on_close_tab, close_tab_menu_item)
+    new_action.triggered.connect(window.on_new)
+    open_action.triggered.connect(window.on_open)
+    save_action.triggered.connect(window.on_save)
+    save_as_action.triggered.connect(window.on_save_as)
+    close_tab_action.triggered.connect(window.on_close_tab)
 
-    menu_bar.Append(file_menu, MENU_FILE_LABEL)
+    menu_bar.addMenu(file_menu)
 
     # ---- Edit menu -------------------------------------------------
-    edit_menu = wx.Menu()
-    # edit_menu.Append(wx.ID_ANY, "Undo")
-    # edit_menu.Append(wx.ID_ANY, "Redo")
-    # edit_menu.Append(wx.ID_ANY, "Cut")
-    # edit_menu.Append(wx.ID_ANY, "Copy")
-    # edit_menu.Append(wx.ID_ANY, "Paste")
+    edit_menu = QMenu(MENU_EDIT_LABEL, menu_bar)
+    find_action = edit_menu.addAction(MENU_FIND_LABEL)
+    find_next_action = edit_menu.addAction(MENU_FIND_NEXT_LABEL)
+    replace_action = edit_menu.addAction(MENU_REPLACE_LABEL)
 
-    edit_menu.AppendSeparator()
-    find_menu_item = edit_menu.Append(wx.ID_ANY, MENU_FIND_LABEL)
-    find_next_menu_item = edit_menu.Append(wx.ID_ANY, MENU_FIND_NEXT_LABEL)
-    replace_menu_item = edit_menu.Append(wx.ID_ANY, MENU_REPLACE_LABEL)
+    find_action.triggered.connect(window.on_find)
+    find_next_action.triggered.connect(window.on_find_next)
+    replace_action.triggered.connect(window.on_replace)
 
-    frame.Bind(wx.EVT_MENU, frame.on_find, find_menu_item)
-    frame.Bind(wx.EVT_MENU, frame.on_find_next, find_next_menu_item)
-    frame.Bind(wx.EVT_MENU, frame.on_replace, replace_menu_item)
-
-    menu_bar.Append(edit_menu, MENU_EDIT_LABEL)
+    menu_bar.addMenu(edit_menu)
 
     # ---- View menu -------------------------------------------------
-    view_menu = wx.Menu()
-    toggle_line_numbers_menu_item = view_menu.Append(
-        wx.ID_ANY, MENU_TOGGLE_LINE_NUMBERS_LABEL
-    )
+    view_menu = QMenu(MENU_VIEW_LABEL, menu_bar)
+    toggle_line_numbers_action = view_menu.addAction(MENU_TOGGLE_LINE_NUMBERS_LABEL)
 
-    frame.Bind(
-        wx.EVT_MENU, frame.on_toggle_line_numbers, toggle_line_numbers_menu_item
-    )
+    toggle_line_numbers_action.triggered.connect(window.on_toggle_line_numbers)
 
-    menu_bar.Append(view_menu, MENU_VIEW_LABEL)
+    menu_bar.addMenu(view_menu)
 
     # ---- Help menu ------------------------------------------------
-    help_menu = wx.Menu()
-    about_menu_item = help_menu.Append(wx.ID_ABOUT, MENU_ABOUT_LABEL)
+    help_menu = QMenu(MENU_HELP_LABEL, menu_bar)
+    about_action = help_menu.addAction(MENU_ABOUT_LABEL)
 
-    frame.Bind(wx.EVT_MENU, frame.on_about, about_menu_item)
+    about_action.triggered.connect(window.on_about)
 
-    menu_bar.Append(help_menu, MENU_HELP_LABEL)
+    menu_bar.addMenu(help_menu)
 
-    frame.SetMenuBar(menu_bar)
+    window.setMenuBar(menu_bar)
+    return menu_bar

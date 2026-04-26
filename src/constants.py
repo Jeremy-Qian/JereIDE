@@ -11,7 +11,7 @@ a value in a component.
 APP_NAME = "JereIDE"
 APP_VERSION = "Beta"
 APP_DESCRIPTION = (
-    "JereIDE – a minimal IDE built with wxPython.\n"
+    "JereIDE – a minimal IDE built with PySide6.\n"
     "Features include opening, saving, and basic text editing."
 )
 APP_COPYRIGHT = "Copyright (C) 2026 Jeremy-Qian"
@@ -47,7 +47,7 @@ EDITOR_FOLD_MARGIN_ID = 2
 EDITOR_FOLD_MARGIN_WIDTH_PX = 12
 
 # ---------------------------------------------------------------------------
-# Editor - Colors (STC Style Specs)
+# Editor - Colors
 # ---------------------------------------------------------------------------
 EDITOR_FG_COLOR_DEFAULT = "#000000"
 EDITOR_BG_COLOR_DEFAULT = "#FFFFFF"
@@ -68,15 +68,15 @@ EDITOR_BG_COLOR_BRACELIGHT = "#FFFF00"
 EDITOR_FG_COLOR_BRACEBAD = "#00009D"
 EDITOR_BG_COLOR_BRACEBAD = "#FF0000"
 EDITOR_FG_COLOR_INDENTGUIDE = "#CDCDCD"
-EDITOR_CARET_COLOR = "BLUE"
+EDITOR_CARET_COLOR = "#0000FF"
 EDITOR_SELECTION_COLOR = "#66CCFF"
 EDITOR_HIGHLIGHT_BG = None  # Uses system default
 EDITOR_HIGHLIGHT_FG = None  # Uses system default
 
 # ---------------------------------------------------------------------------
-# Editor - Fonts (Platform-specific)
+# Editor - Fonts
 # ---------------------------------------------------------------------------
-EDITOR_FONT_FACE_MAC = "Monaco"
+EDITOR_FONT_FACE = "Monospace"
 
 # ---------------------------------------------------------------------------
 # Editor - Caret
@@ -100,16 +100,16 @@ SAVE_DIALOG_TITLE = "Save file as"
 # Menu labels
 # ---------------------------------------------------------------------------
 MENU_FILE_LABEL = "&File"
-MENU_NEW_LABEL = "&New\tCtrl+N"
-MENU_OPEN_LABEL = "&Open...\tCtrl+O"
-MENU_SAVE_LABEL = "&Save\tCtrl+S"
-MENU_SAVE_AS_LABEL = "Save &As...\tCtrl+Shift+S"
-MENU_CLOSE_TAB_LABEL = "&Close Tab\tCtrl+W"
+MENU_NEW_LABEL = "&New"
+MENU_OPEN_LABEL = "&Open..."
+MENU_SAVE_LABEL = "&Save"
+MENU_SAVE_AS_LABEL = "Save &As..."
+MENU_CLOSE_TAB_LABEL = "&Close Tab"
 
 MENU_EDIT_LABEL = "&Edit"
-MENU_FIND_LABEL = "&Find...\tCtrl+F"
-MENU_FIND_NEXT_LABEL = "Find &Next\tF3"
-MENU_REPLACE_LABEL = "&Replace...\tCtrl+H"
+MENU_FIND_LABEL = "&Find..."
+MENU_FIND_NEXT_LABEL = "Find &Next"
+MENU_REPLACE_LABEL = "&Replace..."
 
 MENU_VIEW_LABEL = "&View"
 MENU_TOGGLE_LINE_NUMBERS_LABEL = "Toggle &Line Numbers"
@@ -120,7 +120,7 @@ MENU_ABOUT_LABEL = f"&About {APP_NAME}"
 # ---------------------------------------------------------------------------
 # Sidebar
 # ---------------------------------------------------------------------------
-SIDEBAR_BG_COLOR = (240, 240, 240)
+SIDEBAR_BG_COLOR = "#F0F0F0"
 SIDEBAR_MIN_WIDTH_PX = 200
 SIDEBAR_PLACEHOLDER_TEXT = "Needs Implementation"
 SIDEBAR_PLACEHOLDER_FONT_SIZE = 12
@@ -128,9 +128,9 @@ SIDEBAR_PLACEHOLDER_FONT_SIZE = 12
 # ---------------------------------------------------------------------------
 # Status bar
 # ---------------------------------------------------------------------------
-STATUS_BAR_BG_COLOR = (220, 220, 220)
+STATUS_BAR_BG_COLOR = "#DCDCDC"
 STATUS_BAR_HEIGHT_PX = 25
-STATUS_BAR_BUTTON_PRESS_COLOR = (200, 200, 200)
+STATUS_BAR_BUTTON_PRESS_COLOR = "#C8C8C8"
 INITIAL_CURSOR_POSITION_LABEL = "1:0"
 
 # ---------------------------------------------------------------------------

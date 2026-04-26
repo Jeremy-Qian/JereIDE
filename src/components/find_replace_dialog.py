@@ -1,205 +1,200 @@
 """Find/Replace dialog component for JereIDE."""
 
-import wx
-import wx.stc
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QMessageBox
+from PySide6.QtGui import QTextDocument
 
 
-class FindReplaceDialog(wx.Dialog):
-    """A dialog for finding and replacing text in the editor."""
+class FindDialog(QDialog):
+    """A dialog for finding text in the editor."""
 
-    def __init__(
-        self,
-        parent: wx.Window,
-        editor: wx.stc.StyledTextCtrl,
-        mode: str = "find",
-    ):
-        """Initialize the Find/Replace dialog.
-
-        Args:
-            parent: The parent window.
-            editor: The StyledTextCtrl editor to search in.
-            mode: "find" for Find only, "replace" for Find and Replace.
-        """
-        super().__init__(
-            parent,
-            title="Find" if mode == "find" else "Find and Replace",
-            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
-        )
+    def __init__(self, parent, editor):
+        super().__init__(parent)
         self.editor = editor
-        self.mode = mode
         self._last_search_text = ""
-        self._last_replace_text = ""
-        self._search_flags = 0  # wx.stc.STC_FIND_* flags
+        self._search_flags = 0
         self._init_ui()
-        self.Centre()
-        self.ShowModal()
-        self.Destroy()
+        self.setWindowTitle("Find")
 
     def _init_ui(self) -> None:
         """Initialize the dialog UI components."""
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        layout = QVBoxLayout(self)
 
-        # Find text box
-        find_label = wx.StaticText(self, label="Find:")
-        find_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.find_textCtrl = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.find_textCtrl.SetFocus()
-        find_sizer.Add(self.find_textCtrl, proportion=1, flag=wx.EXPAND)
-
-        main_sizer.Add(find_label, flag=wx.TOP | wx.LEFT, border=10)
-        main_sizer.Add(find_sizer, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
-
-        # Replace text box (only for replace mode)
-        if self.mode == "replace":
-            replace_label = wx.StaticText(self, label="Replace with:")
-            replace_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            self.replace_textCtrl = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-            replace_sizer.Add(self.replace_textCtrl, proportion=1, flag=wx.EXPAND)
-
-            main_sizer.Add(replace_label, flag=wx.TOP | wx.LEFT, border=10)
-            main_sizer.Add(replace_sizer, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+        # Find label and text box
+        find_label = QLabel("Find:")
+        self.find_text = QLineEdit()
+        self.find_text.setFocus()
+        layout.addWidget(find_label)
+        layout.addWidget(self.find_text)
 
         # Options checkboxes
-        options_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.match_case_checkbox = wx.CheckBox(self, label="Match case")
-        self.match_word_checkbox = wx.CheckBox(self, label="Match whole word")
-        options_sizer.Add(self.match_case_checkbox)
-        options_sizer.Add(self.match_word_checkbox, flag=wx.LEFT, border=10)
-
-        main_sizer.Add(options_sizer, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+        options_layout = QHBoxLayout()
+        self.match_case_checkbox = QCheckBox("Match case")
+        self.match_word_checkbox = QCheckBox("Match whole word")
+        options_layout.addWidget(self.match_case_checkbox)
+        options_layout.addWidget(self.match_word_checkbox)
+        layout.addLayout(options_layout)
 
         # Buttons
-        button_sizer = wx.StdDialogButtonSizer()
-
-        if self.mode == "find":
-            find_next_btn = wx.Button(self, label="Find Next")
-            find_next_btn.Bind(wx.EVT_BUTTON, self.on_find_next)
-            button_sizer.AddButton(find_next_btn)
-        else:
-            replace_btn = wx.Button(self, label="Replace")
-            replace_btn.Bind(wx.EVT_BUTTON, self.on_replace)
-            button_sizer.AddButton(replace_btn)
-
-            replace_all_btn = wx.Button(self, label="Replace All")
-            replace_all_btn.Bind(wx.EVT_BUTTON, self.on_replace_all)
-            button_sizer.AddButton(replace_all_btn)
-
-        close_btn = wx.Button(self, wx.ID_CLOSE)
-        close_btn.Bind(wx.EVT_BUTTON, self.on_close)
-        button_sizer.AddButton(close_btn)
-
-        button_sizer.Realize()
-        main_sizer.Add(button_sizer, flag=wx.EXPAND | wx.ALL, border=10)
-
-        self.SetSizer(main_sizer)
-        main_sizer.Fit(self)
+        button_layout = QHBoxLayout()
+        find_next_btn = QPushButton("Find Next")
+        find_next_btn.clicked.connect(self.on_find_next)
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.close)
+        button_layout.addWidget(find_next_btn)
+        button_layout.addWidget(close_btn)
+        layout.addLayout(button_layout)
 
         # Bind enter key to find next
-        self.find_textCtrl.Bind(wx.EVT_TEXT_ENTER, self.on_find_next)
-        if self.mode == "replace":
-            self.replace_textCtrl.Bind(wx.EVT_TEXT_ENTER, self.on_replace)
+        self.find_text.returnPressed.connect(self.on_find_next)
 
-    def _update_search_flags(self) -> None:
-        """Update search flags based on checkbox states."""
-        self._search_flags = 0
-        if self.match_case_checkbox.GetValue():
-            self._search_flags |= wx.stc.STC_FIND_MATCHCASE
-        if self.match_word_checkbox.GetValue():
-            self._search_flags |= wx.stc.STC_FIND_WHOLEWORD
-
-    def on_find_next(self, event: wx.CommandEvent) -> None:
+    def on_find_next(self) -> None:
         """Handle Find Next button click."""
-        self._update_search_flags()
-        find_text = self.find_textCtrl.GetValue()
+        find_text = self.find_text.text()
 
         if not find_text:
-            wx.MessageBox("Please enter text to find.", "Find", wx.OK | wx.ICON_INFORMATION, self)
+            QMessageBox.information(self, "Find", "Please enter text to find.")
             return
 
-        # Store the search text for F3 (find next)
-        self._last_search_text = find_text
-        self.editor.SetSearchFlags(self._search_flags)
-        self.editor.SetTargetStart(self.editor.GetSelectionEnd())
-        self.editor.SetTargetEnd(self.editor.GetLength())
+        # Use Qt's built-in find
+        flags = QTextDocument.FindFlags()
+        if self.match_case_checkbox.isChecked():
+            flags |= QTextDocument.FindCaseSensitively
+        if self.match_word_checkbox.isChecked():
+            flags |= QTextDocument.FindWholeWords
 
-        pos = self.editor.SearchInTarget(find_text)
+        if self.editor.find(find_text, flags):
+            return  # Found
+        
+        # Try wrapping around
+        cursor = self.editor.textCursor()
+        cursor.setPosition(0)
+        self.editor.setTextCursor(cursor)
+        
+        if self.editor.find(find_text, flags):
+            return  # Found
+        
+        QMessageBox.information(self, "Find", f'"{find_text}" not found.')
 
-        if pos == -1:
-            # Wrap around to beginning
-            self.editor.SetTargetStart(0)
-            self.editor.SetTargetEnd(self.editor.GetLength())
-            pos = self.editor.SearchInTarget(find_text)
 
-        if pos == -1:
-            wx.MessageBox(f'"{find_text}" not found.', "Find", wx.OK | wx.ICON_INFORMATION, self)
-        else:
-            self.editor.GotoPos(pos)
-            self.editor.SetSelectionStart(pos)
-            self.editor.SetSelectionEnd(pos + len(find_text))
+class ReplaceDialog(QDialog):
+    """A dialog for finding and replacing text in the editor."""
 
-    def on_replace(self, event: wx.CommandEvent) -> None:
+    def __init__(self, parent, editor):
+        super().__init__(parent)
+        self.editor = editor
+        self._last_search_text = ""
+        self._search_flags = 0
+        self._init_ui()
+        self.setWindowTitle("Find and Replace")
+
+    def _init_ui(self) -> None:
+        """Initialize the dialog UI components."""
+        layout = QVBoxLayout(self)
+
+        # Find label and text box
+        find_label = QLabel("Find:")
+        self.find_text = QLineEdit()
+        self.find_text.setFocus()
+        layout.addWidget(find_label)
+        layout.addWidget(self.find_text)
+
+        # Replace label and text box
+        replace_label = QLabel("Replace with:")
+        self.replace_text = QLineEdit()
+        layout.addWidget(replace_label)
+        layout.addWidget(self.replace_text)
+
+        # Options checkboxes
+        options_layout = QHBoxLayout()
+        self.match_case_checkbox = QCheckBox("Match case")
+        self.match_word_checkbox = QCheckBox("Match whole word")
+        options_layout.addWidget(self.match_case_checkbox)
+        options_layout.addWidget(self.match_word_checkbox)
+        layout.addLayout(options_layout)
+
+        # Buttons
+        button_layout = QHBoxLayout()
+        replace_btn = QPushButton("Replace")
+        replace_btn.clicked.connect(self.on_replace)
+        replace_all_btn = QPushButton("Replace All")
+        replace_all_btn.clicked.connect(self.on_replace_all)
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(self.close)
+        button_layout.addWidget(replace_btn)
+        button_layout.addWidget(replace_all_btn)
+        button_layout.addWidget(close_btn)
+        layout.addLayout(button_layout)
+
+        # Bind enter key to replace
+        self.find_text.returnPressed.connect(self.on_replace)
+
+    def on_replace(self) -> None:
         """Handle Replace button click."""
-        self._update_search_flags()
-        find_text = self.find_textCtrl.GetValue()
-        replace_text = self.replace_textCtrl.GetValue()
+        find_text = self.find_text.text()
+        replace_text = self.replace_text.text()
 
         if not find_text:
-            wx.MessageBox("Please enter text to find.", "Replace", wx.OK | wx.ICON_INFORMATION, self)
+            QMessageBox.information(self, "Replace", "Please enter text to find.")
             return
 
-        # Check if there's a selection that matches
-        if self.editor.GetSelectedText() == find_text:
-            self.editor.ReplaceSelection(replace_text)
+        # Get current selection and check if it matches
+        if self.editor.textCursor().selectedText() == find_text:
+            self.editor.textCursor().insertText(replace_text)
 
         # Find next occurrence
-        self.on_find_next(event)
+        self.on_find_next()
 
-    def on_replace_all(self, event: wx.CommandEvent) -> None:
-        """Handle Replace All button click."""
-        self._update_search_flags()
-        find_text = self.find_textCtrl.GetValue()
-        replace_text = self.replace_textCtrl.GetValue()
+    def on_find_next(self) -> None:
+        """Handle Find Next button click."""
+        find_text = self.find_text.text()
 
         if not find_text:
-            wx.MessageBox("Please enter text to find.", "Replace", wx.OK | wx.ICON_INFORMATION, self)
+            QMessageBox.information(self, "Find", "Please enter text to find.")
             return
 
-        # Record start position for potential restore
+        flags = QTextDocument.FindFlags()
+        if self.match_case_checkbox.isChecked():
+            flags |= QTextDocument.FindCaseSensitively
+        if self.match_word_checkbox.isChecked():
+            flags |= QTextDocument.FindWholeWords
 
+        if self.editor.find(find_text, flags):
+            return  # Found
+        
+        # Try wrapping around
+        cursor = self.editor.textCursor()
+        cursor.setPosition(0)
+        self.editor.setTextCursor(cursor)
+        
+        if self.editor.find(find_text, flags):
+            return  # Found
+        
+        QMessageBox.information(self, "Find", f'"{find_text}" not found.')
 
-        # Start from beginning
-        self.editor.SetSearchFlags(self._search_flags)
-        self.editor.SetTargetStart(0)
-        self.editor.SetTargetEnd(self.editor.GetLength())
+    def on_replace_all(self) -> None:
+        """Handle Replace All button click."""
+        from PySide6.QtGui import QTextCursor
+        
+        find_text = self.find_text.text()
+        replace_text = self.replace_text.text()
+
+        if not find_text:
+            QMessageBox.information(self, "Replace", "Please enter text to find.")
+            return
 
         replacements = 0
-
-        while True:
-            pos = self.editor.SearchInTarget(find_text)
-            if pos == -1:
-                break
-
-            self.editor.SetTargetStart(pos)
-            self.editor.SetTargetEnd(pos + len(find_text))
-            self.editor.ReplaceTarget(replace_text)
+        cursor = self.editor.textCursor()
+        cursor.setPosition(0)
+        self.editor.setTextCursor(cursor)
+        
+        flags = QTextDocument.FindFlags()
+        if self.match_case_checkbox.isChecked():
+            flags |= QTextDocument.FindCaseSensitively
+        if self.match_word_checkbox.isChecked():
+            flags |= QTextDocument.FindWholeWords
+        
+        while self.editor.find(find_text, flags):
+            self.editor.textCursor().insertText(replace_text)
             replacements += 1
 
-            # Move past the replaced text
-            self.editor.SetTargetStart(pos + len(replace_text))
-            self.editor.SetTargetEnd(self.editor.GetLength())
-
-        wx.MessageBox(f"Replaced {replacements} occurrence(s).", "Replace All", wx.OK | wx.ICON_INFORMATION, self)
-
-    def on_close(self, event: wx.CommandEvent) -> None:
-        """Handle Close button click."""
-        self.Close()
-
-
-def show_find_dialog(parent: wx.Window, editor: wx.stc.StyledTextCtrl) -> None:
-    """Show the Find dialog."""
-    FindReplaceDialog(parent, editor, mode="find")
-
-
-def show_replace_dialog(parent: wx.Window, editor: wx.stc.StyledTextCtrl) -> None:
-    """Show the Find and Replace dialog."""
-    FindReplaceDialog(parent, editor, mode="replace")
+        QMessageBox.information(self, "Replace All", f"Replaced {replacements} occurrence(s).")

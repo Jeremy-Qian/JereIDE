@@ -1,11 +1,13 @@
+"""Main window frame for JereIDE using PySide6."""
+
 import os
 from typing import cast
 
-import wx
-import wx.stc
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QWidget
 
 from components.editor import Editor
-from components.find_replace_dialog import show_find_dialog, show_replace_dialog
+from components.find_replace_dialog import FindDialog, ReplaceDialog
 from components.help_dialog import show_about_dialog
 from components.jereidebook import JereIDEBook
 from components.menu import create_menu_bar
@@ -19,148 +21,115 @@ from constants import (
 from utils.file_io import open_file, save_file, FileOperationResult
 
 
-class MainFrame(wx.Frame):
-    def __init__(self, parent, title: str):
-        # Use wx.Size for the window dimensions to satisfy type checking.
-        super().__init__(parent, title=title, size=wx.Size(*DEFAULT_WINDOW_SIZE))
+class MainFrame(QMainWindow):
+    def __init__(self, title: str = "JereIDE"):
+        super().__init__()
+        self.setWindowTitle(title)
+        self.resize(*DEFAULT_WINDOW_SIZE)
         self._init_ui()
 
         # Open an initial empty tab
-        self.on_new(None)
+        self.on_new()
 
     def _init_ui(self) -> None:
         """Initialize the UI components and layout."""
         create_menu_bar(self)
 
-        self.notebook = JereIDEBook(self)
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
 
-        self.sidebar = SideBar(self, on_sidebar_toggle=self._on_sidebar_toggled)
-
-        self.status_bar = StatusBar(self, on_sidebar_toggle=self._on_sidebar_toggled)
+        self.notebook = JereIDEBook()
+        self.sidebar = SideBar(on_sidebar_toggle=self._on_sidebar_toggled)
+        self.status_bar = StatusBar(on_sidebar_toggle=self._on_sidebar_toggled)
         self.status_bar.set_sidebar(self.sidebar, self._on_sidebar_toggled)
-        self.status_bar.sidebar_toggle_btn.Bind(
-            wx.EVT_BUTTON, self.status_bar.on_toggle_sidebar
-        )
 
-        outer_sizer = wx.BoxSizer(wx.VERTICAL)
+        main_layout = QWidget()
+        from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout
+        layout = QVBoxLayout(main_layout)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
-        # Content area: sidebar on the left, separator, and notebook taking the rest.
-        content_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        content_sizer.Add(self.sidebar, 0, wx.EXPAND | wx.RIGHT, 5)
+        # Content area: sidebar on the left and notebook taking the rest
+        content_widget = QWidget()
+        content_layout = QHBoxLayout(content_widget)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(0)
 
-        # Add separator line that will be shown/hidden with the sidebar
-        self.sidebar_separator = wx.StaticLine(self, style=wx.LI_VERTICAL)
-        self.sidebar_separator.Hide()  # Start hidden since sidebar is hidden
-        content_sizer.Add(self.sidebar_separator, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
+        self.sidebar_separator = QWidget()
+        self.sidebar_separator.setFixedWidth(4)
+        self.sidebar_separator.setStyleSheet("background-color: #CCCCCC;")
+        self.sidebar_separator.hide()
 
-        content_sizer.Add(self.notebook, 1, wx.EXPAND)
-        outer_sizer.Add(content_sizer, 1, wx.EXPAND)
+        content_layout.addWidget(self.sidebar)
+        content_layout.addWidget(self.sidebar_separator)
+        content_layout.addWidget(self.notebook, 1)
 
-        # Status bar pinned to the bottom, spanning full width.
-        outer_sizer.Add(self.status_bar, 0, wx.EXPAND)
-        self.SetSizer(outer_sizer)
+        layout.addWidget(content_widget, 1)
+        layout.addWidget(self.status_bar)
 
-        self.Centre()
-        self.Show()
+        self.setCentralWidget(main_layout)
+
+        self.sidebar.hide()
 
     def get_current_editor(self) -> Editor | None:
         """Returns the editor in the currently selected tab."""
-        selection = self.notebook.GetSelection()
-        if selection != wx.NOT_FOUND:
-            return cast(Editor, self.notebook.GetPage(selection))
-        return None
+        return self.notebook.get_current_editor()
 
     def add_new_tab(self, path: str | None = None, content: str = "") -> None:
         """Create a new editor tab."""
-        editor = Editor(self.notebook, file_path=path)
-        editor.SetValue(content)
-        editor.EmptyUndoBuffer()
+        editor = Editor(file_path=path)
+        editor.setText(content)
+        editor.setModified(False)
 
-        editor.Bind(wx.stc.EVT_STC_CHANGE, self._on_text_change)
-        editor.Bind(wx.stc.EVT_STC_UPDATEUI, self._on_update_ui)
+        editor.textChanged.connect(self._on_text_change)
+        editor.cursorPositionChanged.connect(self._on_update_ui)
 
         display_name = os.path.basename(path) if path else UNTITLED_NAME
-        self.notebook.AddPage(editor, display_name, select=True)
+        self.notebook.add_tab(display_name, editor)
 
         editor.update_line_number_margin()
         self._update_title()
 
     # ------------------------------------------------------------------ events
-    def _on_page_changed(self, event: wx.CommandEvent) -> None:
-        """Update window title and status bar when switching tabs."""
-        editor = self.get_current_editor()
-        if editor:
-            self._update_title()
-            self.status_bar.update_from_editor(editor)
-        if event is not None:
-            event.Skip()
-
-    def _on_page_close(self, event: wx.CommandEvent) -> None:
-        """Handle tab closure, checking for unsaved changes."""
-        idx = event.GetSelection()
-        editor = cast(Editor, self.notebook.GetPage(idx))
-
-        if editor.GetModify():
-            res = wx.MessageBox(
-                "File has unsaved changes. Save before closing?",
-                "Unsaved Changes",
-                wx.YES_NO | wx.CANCEL | wx.ICON_QUESTION,
-                self
-            )
-            if res == wx.YES:
-                # Reuse on_save logic but for a specific editor
-                self.notebook.SetSelection(idx)
-                if not self._save_editor(editor):
-                    event.Veto()
-                    return
-            elif res == wx.CANCEL:
-                event.Veto()
-                return
-
-        # If last page is closed, we might want to open a new one or keep it empty
-        # AuiNotebook handles the removal if not vetoed.
-
-    def _on_text_change(self, event: wx.stc.StyledTextEvent) -> None:
+    def _on_text_change(self) -> None:
         """Mark the buffer dirty and refresh title + line-number margin."""
-        editor = cast(Editor, event.GetEventObject())
+        editor = self.sender()
+        if not isinstance(editor, Editor):
+            return
         self._update_title()
 
         # Update tab text to show modified indicator
-        idx = self.notebook.GetPageIndex(editor)
-        if idx != wx.NOT_FOUND:
+        idx = self.notebook.indexOf(editor)
+        if idx >= 0:
             name = os.path.basename(editor.file_path) if editor.file_path else UNTITLED_NAME
-            if editor.GetModify():
+            if editor.isModified():
                 name += "*"
-            self.notebook.SetPageText(idx, name)
+            self.notebook.set_tab_text(idx, name)
 
         editor.update_line_number_margin()
-        if event is not None:
-            event.Skip()
 
-    def _on_update_ui(self, event: wx.stc.StyledTextEvent) -> None:
+    def _on_update_ui(self) -> None:
         """Refresh the status bar in response to caret/selection changes."""
-        editor = cast(Editor, event.GetEventObject())
-        if editor == self.get_current_editor():
+        editor = self.get_current_editor()
+        if editor:
             self.status_bar.update_from_editor(editor)
-        if event is not None:
-            event.Skip()
 
-    def on_toggle_line_numbers(self, event: wx.CommandEvent) -> None:
+    def _on_sidebar_toggled(self, is_shown: bool) -> None:
+        """Handle sidebar toggle - show/hide separator line accordingly."""
+        self.sidebar_separator.setVisible(is_shown)
+        self.update()
+
+    def on_toggle_line_numbers(self) -> None:
         """Handle the Toggle Line Numbers menu command."""
         editor = self.get_current_editor()
         if editor:
             editor.toggle_line_numbers()
 
-    def _on_sidebar_toggled(self, is_shown: bool) -> None:
-        """Handle sidebar toggle - show/hide separator line accordingly."""
-        self.sidebar_separator.Show(is_shown)
-        self.Layout()
-
-    def on_new(self, event: wx.CommandEvent | None) -> None:
+    def on_new(self) -> None:
         """Handle the New menu command."""
         self.add_new_tab()
 
-    def on_open(self, event: wx.CommandEvent) -> None:
+    def on_open(self) -> None:
         """Handle the Open menu command."""
         result = open_file(self)
         if not result.success:
@@ -169,83 +138,93 @@ class MainFrame(wx.Frame):
             return
 
         # Check if already open
-        for i in range(self.notebook.GetPageCount()):
-            page = cast(Editor, self.notebook.GetPage(i))
-            if page.file_path == result.path:
-                self.notebook.SetSelection(i)
+        for i in range(self.notebook.count()):
+            page = self.notebook.widget(i)
+            if isinstance(page, Editor) and page.file_path == result.path:
+                self.notebook.setCurrentIndex(i)
                 return
 
         self.add_new_tab(result.path, result.content or "")
 
-    def on_save(self, event: wx.CommandEvent) -> None:
+    def on_save(self) -> None:
         """Handle the Save menu command."""
         editor = self.get_current_editor()
         if editor:
             self._save_editor(editor)
 
-    def on_save_as(self, event: wx.CommandEvent) -> None:
+    def on_save_as(self) -> None:
         """Handle the Save As menu command."""
         editor = self.get_current_editor()
         if editor:
             self._save_editor(editor, force_dialog=True)
 
-    def on_close_tab(self, event: wx.CommandEvent) -> None:
+    def on_close_tab(self) -> None:
         """Handle the Close Tab menu command."""
-        selection = self.notebook.GetSelection()
-        if selection != wx.NOT_FOUND:
-            # This triggers EVT_AUINOTEBOOK_PAGE_CLOSE
-            self.notebook.DeletePage(selection)
+        idx = self.notebook.currentIndex()
+        if idx >= 0:
+            self._close_tab_by_index(idx)
+
+    def _close_tab_by_index(self, idx: int) -> bool:
+        """Internal method to close a tab by index, checking for unsaved changes."""
+        editor = self.notebook.widget(idx)
+        if isinstance(editor, Editor) and editor.isModified():
+            reply = QMessageBox.question(
+                self,
+                "Unsaved Changes",
+                "File has unsaved changes. Save before closing?",
+                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel
+            )
+            if reply == QMessageBox.Save:
+                self.notebook.setCurrentIndex(idx)
+                if not self._save_editor(editor):
+                    return False
+            elif reply == QMessageBox.Cancel:
+                return False
+
+        self.notebook.removeTab(idx)
+        return True
 
     # ------------------------------------------------------------------ Find/Replace
-    def on_find(self, event: wx.CommandEvent) -> None:
+    def on_find(self) -> None:
         """Handle the Find menu command (Ctrl+F)."""
         editor = self.get_current_editor()
         if editor:
-            show_find_dialog(self, editor)
+            dialog = FindDialog(self, editor)
+            dialog.show()
 
-    def on_find_next(self, event: wx.CommandEvent) -> None:
+    def on_find_next(self) -> None:
         """Handle the Find Next menu command (F3)."""
         editor = self.get_current_editor()
         if editor:
-            # Use the last search if there's a selection
-            selected_text = editor.GetSelectedText()
+            selected_text = editor.selectedText()
             if selected_text:
-                editor.SetSearchFlags(0)
-                editor.SetTargetStart(editor.GetSelectionEnd())
-                editor.SetTargetEnd(editor.GetLength())
-                pos = editor.SearchInTarget(selected_text)
-                if pos == -1:
-                    # Wrap around
-                    editor.SetTargetStart(0)
-                    editor.SetTargetEnd(editor.GetLength())
-                    pos = editor.SearchInTarget(selected_text)
-                if pos != -1:
-                    editor.GotoPos(pos)
-                    editor.SetSelectionStart(pos)
-                    editor.SetSelectionEnd(pos + len(selected_text))
+                editor.findNext(selected_text, 0)
 
-    def on_replace(self, event: wx.CommandEvent) -> None:
+    def on_replace(self) -> None:
         """Handle the Replace menu command (Ctrl+H)."""
         editor = self.get_current_editor()
         if editor:
-            show_replace_dialog(self, editor)
+            dialog = ReplaceDialog(self, editor)
+            dialog.show()
 
     # ------------------------------------------------------------------ save
     def _save_editor(self, editor: Editor, force_dialog: bool = False) -> bool:
         """Internal helper to save a specific editor's content."""
         path_to_save = None if force_dialog else editor.file_path
-        result = save_file(self, path_to_save, editor.GetText())
+        result = save_file(self, path_to_save, editor.text())
 
         if not result.success:
             return False
 
         editor.file_path = result.path
-        editor.SetSavePoint()
-        self.notebook.SetPageText(self.notebook.GetPageIndex(editor), os.path.basename(result.path or ""))
+        editor.setModified(False)
+        idx = self.notebook.indexOf(editor)
+        if idx >= 0:
+            self.notebook.set_tab_text(idx, os.path.basename(result.path or ""))
         self._update_title()
         return True
 
-    def on_about(self, event: wx.CommandEvent) -> None:
+    def on_about(self) -> None:
         """Display an About dialog for JereIDE."""
         show_about_dialog(self)
 
@@ -254,25 +233,18 @@ class MainFrame(wx.Frame):
         """Update the window title to reflect current file name and modification status."""
         editor = self.get_current_editor()
         if not editor:
-            self.SetTitle(f"{UNTITLED_NAME} - {os.path.basename(os.getcwd())}")
-            self.SetRepresentedFilename("")
-            self.OSXSetModified(False)
+            self.setWindowTitle(f"{UNTITLED_NAME} - {os.path.basename(os.getcwd())}")
             return
 
         path = editor.file_path
-        is_modified = editor.GetModify()
+        is_modified = editor.isModified()
 
         if path:
             display_title = os.path.basename(path)
-            self.SetRepresentedFilename(path)
         else:
             display_title = UNTITLED_NAME
-            self.SetRepresentedFilename("")
 
         if is_modified:
-            self.OSXSetModified(True)
             display_title += MACOS_EDITED_SUFFIX
-        else:
-            self.OSXSetModified(False)
 
-        self.SetTitle(display_title)
+        self.setWindowTitle(display_title)

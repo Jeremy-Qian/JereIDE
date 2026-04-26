@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
-import wx
+from PySide6.QtWidgets import QFileDialog, QMessageBox, QWidget
 
 from constants import FILE_WILDCARDS, OPEN_DIALOG_TITLE, SAVE_DIALOG_TITLE
 
@@ -27,99 +27,86 @@ class FileOperationResult:
     error: Optional[str] = None
 
 
-def _show_error_dialog(parent: wx.Window, title: str, message: str) -> None:
+def _show_error_dialog(parent: QWidget, title: str, message: str) -> None:
     """Display a modal error message box."""
-    wx.MessageBox(message, title, wx.OK | wx.ICON_ERROR, parent)
+    QMessageBox.critical(parent, title, message)
 
 
-def open_file(parent: wx.Window) -> FileOperationResult:
+def open_file(parent: QWidget) -> FileOperationResult:
     """Show a file-open dialog and return the selected file's contents.
 
     Returns:
         FileOperationResult with success=True and content if successful,
         or success=False with error message on failure.
     """
-    open_dialog = wx.FileDialog(
-        parent, OPEN_DIALOG_TITLE, os.getcwd(), "", FILE_WILDCARDS, wx.FD_OPEN
+    file_path, _ = QFileDialog.getOpenFileName(
+        parent, OPEN_DIALOG_TITLE, os.getcwd(), FILE_WILDCARDS
     )
 
-    result = FileOperationResult(success=False)
+    if not file_path:
+        return FileOperationResult(success=False)
+
+    # Check if file exists and is readable
+    if not os.path.exists(file_path):
+        _show_error_dialog(
+            parent,
+            _FILE_ERROR_TITLE,
+            f"File not found: {file_path}"
+        )
+        return FileOperationResult(success=False, error=f"File not found: {file_path}")
+
+    if not os.access(file_path, os.R_OK):
+        _show_error_dialog(
+            parent,
+            _FILE_ERROR_TITLE,
+            f"Permission denied: {file_path}\nYou do not have read permissions for this file."
+        )
+        return FileOperationResult(success=False, error=f"Permission denied: {file_path}")
+
+    # Attempt to read the file with specific error handling
     try:
-        if open_dialog.ShowModal() != wx.ID_OK:
-            return result
-
-        selected_path = open_dialog.GetPath()
-
-        # Check if file exists and is readable
-        if not os.path.exists(selected_path):
-            _show_error_dialog(
-                parent,
-                _FILE_ERROR_TITLE,
-                f"File not found: {selected_path}",
-            )
-            result.error = f"File not found: {selected_path}"
-            return result
-
-        if not os.access(selected_path, os.R_OK):
-            _show_error_dialog(
-                parent,
-                _FILE_ERROR_TITLE,
-                f"Permission denied: {selected_path}\n"
-                "You do not have read permissions for this file.",
-            )
-            result.error = f"Permission denied: {selected_path}"
-            return result
-
-        # Attempt to read the file with specific error handling
-        try:
-            with open(selected_path, "r", encoding="utf-8") as source_file:
-                file_content = source_file.read()
-            result = FileOperationResult(success=True, path=selected_path, content=file_content)
-        except UnicodeDecodeError as decode_error:
-            _show_error_dialog(
-                parent,
-                _ENCODING_ERROR_TITLE,
-                f"Error reading file: {selected_path}\n"
-                f"The file contains characters that cannot be decoded as UTF-8.\n"
-                f"UnicodeDecodeError: {decode_error}",
-            )
-            result.error = f"Unicode decode error in {selected_path}"
-        except PermissionError:
-            _show_error_dialog(
-                parent,
-                _FILE_ERROR_TITLE,
-                f"Permission denied: {selected_path}\n"
-                "You do not have read permissions for this file.",
-            )
-            result.error = f"Permission denied: {selected_path}"
-        except FileNotFoundError:
-            _show_error_dialog(
-                parent,
-                _FILE_ERROR_TITLE,
-                f"File not found: {selected_path}",
-            )
-            result.error = f"File not found: {selected_path}"
-        except OSError as os_error:
-            _show_error_dialog(
-                parent,
-                _FILE_ERROR_TITLE,
-                f"Error reading file: {selected_path}\n"
-                f"OS Error: {os_error.strerror} (errno {os_error.errno})",
-            )
-            result.error = f"OS Error: {os_error.strerror}"
-    finally:
-        open_dialog.Destroy()
-
-    return result
+        with open(file_path, "r", encoding="utf-8") as source_file:
+            file_content = source_file.read()
+        return FileOperationResult(success=True, path=file_path, content=file_content)
+    except UnicodeDecodeError as decode_error:
+        _show_error_dialog(
+            parent,
+            _ENCODING_ERROR_TITLE,
+            f"Error reading file: {file_path}\n"
+            f"The file contains characters that cannot be decoded as UTF-8.\n"
+            f"UnicodeDecodeError: {decode_error}"
+        )
+        return FileOperationResult(success=False, error=f"Unicode decode error in {file_path}")
+    except PermissionError:
+        _show_error_dialog(
+            parent,
+            _FILE_ERROR_TITLE,
+            f"Permission denied: {file_path}\nYou do not have read permissions for this file."
+        )
+        return FileOperationResult(success=False, error=f"Permission denied: {file_path}")
+    except FileNotFoundError:
+        _show_error_dialog(
+            parent,
+            _FILE_ERROR_TITLE,
+            f"File not found: {file_path}"
+        )
+        return FileOperationResult(success=False, error=f"File not found: {file_path}")
+    except OSError as os_error:
+        _show_error_dialog(
+            parent,
+            _FILE_ERROR_TITLE,
+            f"Error reading file: {file_path}\nOS Error: {os_error.strerror} (errno {os_error.errno})"
+        )
+        return FileOperationResult(success=False, error=f"OS Error: {os_error.strerror}")
 
 
 def save_file(
-    parent: wx.Window, current_path: Optional[str], content: str
+    parent: QWidget, current_path: Optional[str], content: str
 ) -> FileOperationResult:
     """Save ``content`` to ``current_path``, prompting for a path if needed.
 
     Args:
-        parent: Parent window for modal dialogs.
+        parent: Parent widget for modal dialogs.
         current_path: The file's existing path, or ``None`` to trigger a
             "Save As" prompt.
         content: The text to write.
@@ -130,20 +117,14 @@ def save_file(
     """
     target_path = current_path
     if not target_path:
-        save_dialog = wx.FileDialog(
+        target_path, _ = QFileDialog.getSaveFileName(
             parent,
             SAVE_DIALOG_TITLE,
             os.getcwd(),
-            "",
-            FILE_WILDCARDS,
-            wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+            FILE_WILDCARDS
         )
-        try:
-            if save_dialog.ShowModal() != wx.ID_OK:
-                return FileOperationResult(success=False)
-            target_path = save_dialog.GetPath()
-        finally:
-            save_dialog.Destroy()
+        if not target_path:
+            return FileOperationResult(success=False)
 
     # Check directory permissions
     target_directory = os.path.dirname(target_path)
@@ -151,8 +132,7 @@ def save_file(
         _show_error_dialog(
             parent,
             _FILE_ERROR_TITLE,
-            f"Cannot save to: {target_directory}\n"
-            "You may not have write permissions for this directory.",
+            f"Cannot save to: {target_directory}\nYou may not have write permissions for this directory."
         )
         return FileOperationResult(
             success=False,
@@ -168,8 +148,7 @@ def save_file(
         _show_error_dialog(
             parent,
             _FILE_ERROR_TITLE,
-            f"Permission denied: {target_path}\n"
-            "You do not have write permissions for this file.",
+            f"Permission denied: {target_path}\nYou do not have write permissions for this file."
         )
         return FileOperationResult(
             success=False,
@@ -179,8 +158,7 @@ def save_file(
         _show_error_dialog(
             parent,
             _FILE_ERROR_TITLE,
-            f"Directory not found: {target_directory}\n"
-            "The parent directory does not exist.",
+            f"Directory not found: {target_directory}\nThe parent directory does not exist."
         )
         return FileOperationResult(
             success=False,
@@ -190,8 +168,7 @@ def save_file(
         _show_error_dialog(
             parent,
             _FILE_ERROR_TITLE,
-            f"Error saving file: {target_path}\n"
-            f"OS Error: {os_error.strerror} (errno {os_error.errno})",
+            f"Error saving file: {target_path}\nOS Error: {os_error.strerror} (errno {os_error.errno})"
         )
         return FileOperationResult(
             success=False,
